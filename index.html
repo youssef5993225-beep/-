@@ -2,392 +2,676 @@
 <html lang="ar" dir="rtl">
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>تحدي تخمين اللاعبين الأسطوري - النسخة الضخمة</title>
-    <link href="https://fonts.googleapis.com/css2?family=Cairo:wght@400;700;900&display=swap" rel="stylesheet">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>تحدي تخمين اللاعبين الأسطوري</title>
+    <link href="https://fonts.googleapis.com/css2?family=Cairo:wght@400;600;700;900&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
     
     <style>
         :root {
-            --bg-gradient: linear-gradient(135deg, #0f2027, #203a43, #2c5364);
-            --primary-color: #ffc107;
-            --primary-hover: #e0a800;
-            --card-bg: rgba(255, 255, 255, 0.06);
-            --card-border: rgba(255, 255, 255, 0.1);
+            --bg-color: #0b1520;
+            --card-dark: #111e2e;
+            --primary-yellow: #f1c40f;
+            --primary-hover: #d4ac0d;
+            --border-gold: #f1c40f;
             --text-main: #ffffff;
-            --text-muted: #b3c6cd;
-            --danger-color: #ff4757;
+            --text-muted: #95a5a6;
+            --danger-red: #e74c3c;
         }
 
-        * { box-sizing: border-box; margin: 0; padding: 0; font-family: 'Cairo', sans-serif; }
-        body { background: var(--bg-gradient); color: var(--text-main); min-height: 100vh; display: flex; justify-content: center; align-items: center; padding: 20px; overflow-x: hidden; }
+        * {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+            font-family: 'Cairo', sans-serif;
+            -webkit-tap-highlight-color: transparent;
+        }
 
+        body {
+            background-color: var(--bg-color);
+            color: var(--text-main);
+            min-height: 100vh;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            padding: 15px;
+        }
+
+        /* حاوية البرنامج الرئيسية - نفس إطار الصورة الذهبي الرفيع والأركان المنحنية */
         .app-container {
-            width: 100%; max-width: 900px; background: rgba(15, 32, 39, 0.75); backdrop-filter: blur(15px); -webkit-backdrop-filter: blur(15px);
-            border: 2px solid var(--card-border); border-radius: 24px; padding: 30px; box-shadow: 0 20px 50px rgba(0,0,0,0.5);
-            position: relative; min-height: 600px; display: flex; flex-direction: column; justify-content: space-between;
+            width: 100%;
+            max-width: 1000px;
+            background-color: #0d1b2a;
+            border: 2px solid var(--border-gold);
+            border-radius: 16px;
+            padding: 30px;
+            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.7);
+            position: relative;
+            min-height: 550px;
+            display: flex;
+            flex-direction: column;
+            justify-content: space-between;
         }
 
-        .slide { display: none; animation: fadeIn 0.4s ease forwards; flex-grow: 1; flex-direction: column; justify-content: center; align-items: center; text-align: center; }
-        .slide.active { display: flex; }
-        @keyframes fadeIn { from { opacity: 0; transform: translateY(10px); } to { opacity: 1; transform: translateY(0); } }
-
-        h1 { font-size: 2.3rem; font-weight: 900; margin-bottom: 15px; }
-        h1 span { color: var(--primary-color); }
-        .big-name { font-size: 3.5rem; font-weight: 900; color: var(--primary-color); margin: 15px 0; text-shadow: 0 0 15px rgba(255, 193, 7, 0.3); }
-
-        .instruction-box {
-            background: rgba(255, 71, 87, 0.12); border: 2px dashed var(--danger-color); padding: 12px 25px;
-            border-radius: 50px; font-size: 1.2rem; font-weight: 700; color: #ff6b81; margin: 20px 0; display: inline-flex; align-items: center; gap: 10px;
+        .slide {
+            display: none;
+            animation: fadeIn 0.3s ease forwards;
+            flex-grow: 1;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+            width: 100%;
         }
 
-        .dynamic-desc { font-size: 1.1rem; color: var(--text-muted); max-width: 600px; line-height: 1.6; margin-bottom: 15px; }
-        .game-layout { display: flex; width: 100%; gap: 25px; margin-top: 15px; align-items: flex-start; }
-        .controls-side { flex: 1; display: flex; flex-direction: column; gap: 15px; text-align: right; }
-        .display-side { flex: 1.2; background: var(--card-bg); border: 1px solid var(--card-border); border-radius: 20px; padding: 20px; display: flex; flex-direction: column; align-items: center; box-shadow: 0 10px 35px rgba(0,0,0,0.2); }
-
-        .search-container { position: relative; width: 100%; }
-        .search-box { width: 100%; padding: 12px 40px 12px 15px; background: rgba(255, 255, 255, 0.08); border: 2px solid var(--card-border); border-radius: 12px; color: #fff; font-size: 1rem; font-weight: 700; }
-        .search-box:focus { outline: none; border-color: var(--primary-color); }
-        .search-icon { position: absolute; right: 15px; top: 50%; transform: translateY(-50%); color: var(--text-muted); }
-
-        .suggestions-list {
-            position: absolute; top: 100%; left: 0; right: 0; background: #1a3644; border: 1px solid var(--card-border);
-            border-radius: 12px; max-height: 200px; overflow-y: auto; z-index: 99; display: none; box-shadow: 0 10px 25px rgba(0,0,0,0.5);
+        .slide.active {
+            display: flex;
         }
 
-        .suggestion-item { padding: 12px 15px; cursor: pointer; text-align: right; border-bottom: 1px solid rgba(255,255,255,0.05); font-weight: 700; }
-        .suggestion-item:hover { background: var(--primary-color); color: #0f2027; }
+        @keyframes fadeIn {
+            from { opacity: 0; transform: scale(0.98); }
+            to { opacity: 1; transform: scale(1); }
+        }
 
-        .player-image-wrapper { width: 100%; height: 240px; border-radius: 14px; overflow: hidden; background: #11252f; margin-bottom: 15px; position: relative; display: flex; justify-content: center; align-items: center; border: 2px solid rgba(255,255,255,0.1); }
-        .player-image { width: 100%; height: 100%; object-fit: scale-down; }
-        .fallback-avatar { font-size: 5rem; color: rgba(255,255,255,0.2); position: absolute; }
-        .player-name-title { font-size: 2rem; font-weight: 900; color: var(--primary-color); margin-bottom: 15px; text-align: center; }
+        /* شاشة الحظر (غمض عينك) */
+        .step-header {
+            font-size: 1.6rem;
+            font-weight: 700;
+            color: var(--text-main);
+            align-self: flex-start;
+            margin-bottom: 20px;
+            border-right: 4px solid var(--primary-yellow);
+            padding-right: 10px;
+        }
 
-        .info-rows { width: 100%; text-align: right; }
-        .info-row { font-size: 1.05rem; margin-bottom: 10px; line-height: 1.5; display: flex; align-items: flex-start; gap: 8px; }
-        .info-row strong { color: var(--text-muted); white-space: nowrap; }
+        .huge-player-name {
+            font-size: 4rem;
+            font-weight: 900;
+            color: var(--primary-yellow);
+            margin: 30px 0;
+            text-shadow: 0 0 10px rgba(241, 196, 15, 0.2);
+        }
 
-        .input-group { width: 100%; max-width: 450px; margin: 10px 0; text-align: right; }
-        .input-group label { display: block; margin-bottom: 6px; font-weight: 700; color: var(--text-muted); }
-        .input-group input { width: 100%; padding: 14px; background: rgba(255, 255, 255, 0.06); border: 2px solid var(--card-border); border-radius: 12px; color: #fff; font-size: 1.1rem; text-align: center; font-weight: 700; }
+        .alert-pill {
+            background: rgba(231, 76, 60, 0.1);
+            border: 1px dashed var(--danger-red);
+            padding: 12px 30px;
+            border-radius: 50px;
+            font-size: 1.3rem;
+            font-weight: 700;
+            color: #ff6b6b;
+            margin-bottom: 30px;
+            display: inline-flex;
+            align-items: center;
+            gap: 10px;
+        }
 
-        .btn { background: var(--primary-color); color: #0f2027; border: none; padding: 12px 30px; font-size: 1.1rem; font-weight: 700; border-radius: 50px; cursor: pointer; display: inline-flex; align-items: center; gap: 10px; box-shadow: 0 5px 15px rgba(255, 193, 7, 0.2); justify-content: center; }
-        .btn:hover { background: var(--primary-hover); transform: translateY(-1px); }
-        .btn-secondary { background: rgba(255,255,255,0.08); color: #fff; box-shadow: none; border: 1px solid var(--card-border); }
-        .btn-secondary:hover { background: rgba(255,255,255,0.15); }
+        .alert-pill span {
+            color: var(--primary-yellow);
+        }
 
-        .tips-list { list-style: none; margin: 10px 0; }
-        .tips-list li { margin-bottom: 8px; color: var(--text-muted); font-size: 0.95rem; }
-        .footer-nav { display: flex; justify-content: space-between; width: 100%; margin-top: 25px; padding-top: 15px; border-top: 1px solid rgba(255,255,255,0.08); color: var(--text-muted); font-size: 0.9rem; }
+        .dynamic-instruction {
+            font-size: 1.15rem;
+            color: var(--text-main);
+            margin-bottom: 40px;
+            font-weight: 600;
+            text-align: center;
+        }
+
+        /* شاشة عرض الكارت والتحكم - النصفين الطوليين كما في الصور */
+        .game-layout {
+            display: flex;
+            width: 100%;
+            gap: 20px;
+            align-items: stretch;
+        }
+
+        /* الجانب الأيمن: التحكم والبحث */
+        .controls-panel {
+            flex: 1;
+            background-color: rgba(255, 255, 255, 0.02);
+            border: 1px solid rgba(255, 255, 255, 0.05);
+            border-radius: 14px;
+            padding: 20px;
+            display: flex;
+            flex-direction: column;
+            gap: 15px;
+            text-align: right;
+        }
+
+        .panel-title {
+            color: var(--primary-yellow);
+            font-size: 1.15rem;
+            font-weight: 700;
+            margin-bottom: 5px;
+        }
+
+        .search-wrapper {
+            position: relative;
+            width: 100%;
+        }
+
+        .search-input {
+            width: 100%;
+            padding: 12px 15px 12px 40px;
+            background: #162639;
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            border-radius: 8px;
+            color: #fff;
+            font-size: 1rem;
+            font-weight: 600;
+            text-align: right;
+        }
+
+        .search-input:focus {
+            outline: none;
+            border-color: var(--primary-yellow);
+        }
+
+        .search-wrapper i {
+            position: absolute;
+            left: 15px;
+            top: 50%;
+            transform: translateY(-50%);
+            color: var(--text-muted);
+        }
+
+        .suggestions-dropdown {
+            position: absolute;
+            top: 100%;
+            left: 0;
+            right: 0;
+            background: #1c2d42;
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            border-radius: 8px;
+            max-height: 180px;
+            overflow-y: auto;
+            z-index: 10;
+            display: none;
+        }
+
+        .suggest-item {
+            padding: 10px 15px;
+            cursor: pointer;
+            border-bottom: 1px solid rgba(255, 255, 255, 0.05);
+            font-size: 0.95rem;
+        }
+
+        .suggest-item:hover {
+            background-color: var(--primary-yellow);
+            color: #000;
+        }
+
+        .rule-checkbox {
+            display: flex;
+            align-items: flex-start;
+            gap: 10px;
+            font-size: 0.95rem;
+            color: var(--text-main);
+            line-height: 1.4;
+        }
+
+        .rule-checkbox i {
+            color: var(--primary-yellow);
+            margin-top: 3px;
+        }
+
+        /* الجانب الأيسر: كارت اللاعب الكبير الفخم */
+        .card-panel {
+            flex: 1;
+            background-color: var(--card-dark);
+            border-radius: 14px;
+            padding: 20px;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            border: 1px solid rgba(255, 255, 255, 0.05);
+        }
+
+        .player-avatar-box {
+            width: 100%;
+            height: 220px;
+            background: linear-gradient(180deg, #162639, #0d1b2a);
+            border-radius: 10px;
+            margin-bottom: 15px;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            overflow: hidden;
+            border: 1px solid rgba(255, 255, 255, 0.1);
+        }
+
+        .player-avatar-box img {
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+        }
+
+        /* في حال كانت الصورة عبارة عن كارت مخصص مبني برمجياً */
+        .player-avatar-box .custom-avatar {
+            width: 100%;
+            height: 100%;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            font-size: 3.5rem;
+            font-weight: 900;
+            color: #fff;
+            background: linear-gradient(135deg, #6a11cb 0%, #2575fc 100%);
+        }
+
+        .card-player-name {
+            font-size: 1.8rem;
+            font-weight: 900;
+            color: var(--primary-yellow);
+            margin-bottom: 15px;
+            text-align: center;
+        }
+
+        .specs-list {
+            width: 100%;
+            display: flex;
+            flex-direction: column;
+            gap: 12px;
+            text-align: right;
+        }
+
+        .spec-item {
+            font-size: 1rem;
+            line-height: 1.5;
+        }
+
+        .spec-item strong {
+            color: var(--text-muted);
+            font-weight: 600;
+            display: inline-block;
+            min-width: 90px;
+        }
+
+        /* الأزرار الدائرية الكبيرة باللون الأصفر */
+        .btn-yellow {
+            background-color: var(--primary-yellow);
+            color: #000;
+            border: none;
+            padding: 14px 40px;
+            font-size: 1.15rem;
+            font-weight: 700;
+            border-radius: 50px;
+            cursor: pointer;
+            box-shadow: 0 4px 15px rgba(241, 196, 15, 0.3);
+            display: inline-flex;
+            align-items: center;
+            gap: 10px;
+            transition: all 0.2s;
+        }
+
+        .btn-yellow:hover {
+            background-color: var(--primary-hover);
+            transform: translateY(-1px);
+        }
+
+        .btn-outline {
+            background: transparent;
+            color: #fff;
+            border: 1px solid rgba(255, 255, 255, 0.2);
+            padding: 10px 20px;
+            font-size: 0.95rem;
+            font-weight: 600;
+            border-radius: 50px;
+            cursor: pointer;
+            display: inline-flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+        .btn-outline:hover {
+            background: rgba(255, 255, 255, 0.05);
+        }
+
+        /* شاشة البداية لإدخال الأسماء */
+        .setup-group {
+            width: 100%;
+            max-width: 400px;
+            margin: 15px 0;
+            text-align: right;
+        }
+
+        .setup-group label {
+            display: block;
+            margin-bottom: 8px;
+            font-weight: 600;
+            color: var(--text-muted);
+        }
+
+        .setup-group input {
+            width: 100%;
+            padding: 12px;
+            background: #111e2e;
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            border-radius: 8px;
+            color: #fff;
+            font-size: 1.1rem;
+            font-weight: 700;
+            text-align: center;
+        }
+
+        /* شريط الحالة السفلي الديناميكي */
+        .footer-status {
+            display: flex;
+            justify-content: space-between;
+            width: 100%;
+            margin-top: 25px;
+            padding-top: 15px;
+            border-top: 1px solid rgba(255, 255, 255, 0.05);
+            font-size: 0.9rem;
+            color: var(--text-muted);
+        }
+
+        .matchup-badge span {
+            background: #e67e22;
+            color: #fff;
+            padding: 1px 5px;
+            border-radius: 3px;
+            font-size: 0.75rem;
+            font-weight: 700;
+            margin: 0 4px;
+        }
+
+        /* استجابة الشاشات الصغيرة للموبايل */
+        @media (max-width: 768px) {
+            .game-layout { flex-direction: column; }
+            .huge-player-name { font-size: 2.8rem; }
+            .app-container { padding: 15px; }
+        }
     </style>
 </head>
 <body>
 
     <div class="app-container">
         
-        <!-- شريحة 1: إدخال الأسماء -->
         <div class="slide active" id="slide-1">
-            <h1>تحدي <span style="color: var(--primary-color);">تخمين اللاعبين الأسطوري</span></h1>
-            <p style="color: var(--text-muted); margin-bottom: 20px;">النسخة المحدثة (50 لاعباً من صفوة نجوم وأساطير الكرة)</p>
+            <h1 style="font-size: 2rem; font-weight: 900; margin-bottom: 10px; color: var(--primary-yellow);">تحدي تخمين اللاعبين الأسطوري</h1>
+            <p style="color: var(--text-muted); margin-bottom: 30px;">قم بإدخال الأسماء لبدء المواجهة الفخمة</p>
             
-            <div class="input-group">
-                <label>اسم اللاعب الأول:</label>
-                <input type="text" id="p1-input" value="">
+            <div class="setup-group">
+                <label>اللاعب الأول:</label>
+                <input type="text" id="name-p1" value="يوسف">
             </div>
-            <div class="input-group">
-                <label>اسم اللاعب الثاني:</label>
-                <input type="text" id="p2-input" value="">
+            <div class="setup-group">
+                <label>اللاعب الثاني:</label>
+                <input type="text" id="name-p2" value="ياسين">
             </div>
             
-            <button class="btn" style="margin-top: 20px;" onclick="startGame()">ابدأ التحدي <i class="fa-solid fa-play"></i></button>
+            <button class="btn-yellow" style="margin-top: 30px;" onclick="initGame()">ابدأ الجولة الآن <i class="fa-solid fa-bolt"></i></button>
         </div>
 
-        <!-- شريحة 2 -->
         <div class="slide" id="slide-2">
-            <div class="big-name" id="s2-title"></div>
-            <div class="instruction-box">
-                <i class="fa-solid fa-eye-slash"></i> غَمِّض عينك تماماً يا <span id="s2-alert" style="color: #fff;"></span>
+            <div class="step-header">الخطوة الأولى: دور اللاعب الأول</div>
+            <div class="huge-player-name" id="s2-active-player">يوسف</div>
+            <div class="alert-pill">
+                <i class="fa-solid fa-eye-slash"></i> غَمِّض عينك تماماً يا <span id="s2-target-player">ياسين</span>
             </div>
-            <div class="dynamic-desc" id="s2-desc"></div>
-            <button class="btn" onclick="nextSlide()">رؤية كارت التخمين <i class="fa-solid fa-eye"></i></button>
+            <div class="dynamic-instruction" id="s2-text">سيشاهد كارت اللاعب السري الخاص بخصمه لتوجيهه بالأسئلة والمواصفات!</div>
+            <button class="btn-yellow" onclick="goToNextSlide()">رؤية مواصفات اللاعب <i class="fa-solid fa-eye"></i></button>
         </div>
 
-        <!-- شريحة 3 -->
         <div class="slide" id="slide-3">
             <div class="game-layout">
-                <div class="controls-side">
-                    <h3 style="color: var(--primary-color);">محرك بحث اللاعبين (50 لاعب):</h3>
-                    <div class="search-container">
-                        <i class="fa-solid fa-magnifying-glass search-icon"></i>
-                        <input type="text" class="search-box" id="search-1" placeholder="ابحث باسم اللاعب، النادي أو الجنسية..." oninput="handleSearch(1)">
-                        <div class="suggestions-list" id="suggest-1"></div>
+                <div class="controls-panel">
+                    <div class="panel-title" id="s3-search-title">ابحث عن لاعب لتخصيصه لـ:</div>
+                    <div class="search-wrapper">
+                        <input type="text" class="search-input" id="search-box-1" placeholder="اكتب اسم اللاعب لتغييره..." oninput="triggerSearch(1)">
+                        <i class="fa-solid fa-magnifying-glass"></i>
+                        <div class="suggestions-dropdown" id="drop-1"></div>
                     </div>
-                    <ul class="tips-list">
-                        <li><i class="fa-solid fa-circle-info"></i> قاعدة البيانات تحتوي على نجوم الحاليين، أساطير، ونجوم عرب!</li>
-                    </ul>
-                    <button class="btn btn-secondary" onclick="rerollPlayer(1)"><i class="fa-solid fa-shuffle"></i> لاعب عشوائي آخر</button>
-                    <button class="btn" style="margin-top: auto;" onclick="nextSlide()">حفظت البيانات؟ التالي <i class="fa-solid fa-arrow-left"></i></button>
+                    
+                    <div class="rule-checkbox">
+                        <i class="fa-solid fa-circle-check"></i>
+                        <div>هذا الكرت والاسم مخفي تماماً عن اللاعب الآخر!</div>
+                    </div>
+                    <div class="rule-checkbox">
+                        <i class="fa-solid fa-circle-check"></i>
+                        <div>دعه يسألك أسئلة إجابتها "نعم" أو "لا" فقط.</div>
+                    </div>
+                    <div class="rule-checkbox">
+                        <i class="fa-solid fa-circle-check"></i>
+                        <div>استخدم الصورة والمواصفات المعروضة لتوجيهه بذكاء.</div>
+                    </div>
+
+                    <button class="btn-outline" style="margin-top: 15px;" onclick="generateRandomCard(1)"><i class="fa-solid fa-shuffle"></i> لاعب عشوائي آخر</button>
                 </div>
-                
-                <div class="display-side">
-                    <div class="player-image-wrapper">
-                        <div class="fallback-avatar" id="fallback-1"><i class="fa-solid fa-user-astronaut"></i></div>
-                        <img src="" class="player-image" id="img-1" alt="صورة اللاعب" style="display:none;" onerror="handleImageError(1)">
-                    </div>
-                    <div class="player-name-title" id="name-1"></div>
-                    <div class="info-rows">
-                        <div class="info-row"><strong><i class="fa-solid fa-globe"></i> الجنسية:</strong> <span id="nat-1"></span></div>
-                        <div class="info-row"><strong><i class="fa-solid fa-shirt"></i> النادي/الحالة:</strong> <span id="club-1"></span></div>
-                        <div class="info-row"><strong><i class="fa-solid fa-arrows-up-down-left-right"></i> المركز:</strong> <span id="pos-1"></span></div>
-                        <div class="info-row"><strong><i class="fa-solid fa-star"></i> تلميح ذهبي:</strong> <span id="feat-1"></span></div>
+
+                <div class="card-panel">
+                    <div class="player-avatar-box" id="p-img-box-1">
+                        </div>
+                    <div class="card-player-name" id="p-name-1">كريستيانو رونالدو</div>
+                    <div class="specs-list">
+                        <div class="spec-item"><strong>🌐 الجنسية:</strong> <span id="p-nat-1"></span></div>
+                        <div class="spec-item"><strong>👕 النادي الحالي:</strong> <span id="p-club-1"></span></div>
+                        <div class="spec-item"><strong>🔀 المركز:</strong> <span id="p-pos-1"></span></div>
+                        <div class="spec-item"><strong>⭐ ميزة مشهورة:</strong> <span id="p-feat-1"></span></div>
                     </div>
                 </div>
             </div>
+            <button class="btn-yellow" style="margin-top: 20px; align-self: flex-start;" onclick="goToNextSlide()">حفظت المواصفات؟ التالي <i class="fa-solid fa-chevron-left"></i></button>
         </div>
 
-        <!-- شريحة 4 -->
         <div class="slide" id="slide-4">
-            <div class="big-name" id="s4-title"></div>
-            <div class="instruction-box">
-                <i class="fa-solid fa-eye-slash"></i> غَمِّض عينك تماماً يا <span id="s4-alert" style="color: #fff;"></span>
+            <div class="step-header">الخطوة الثانية: دور اللاعب الثاني</div>
+            <div class="huge-player-name" id="s4-active-player">ياسين</div>
+            <div class="alert-pill">
+                <i class="fa-solid fa-eye-slash"></i> غَمِّض عينك تماماً يا <span id="s4-target-player">يوسف</span>
             </div>
-            <div class="dynamic-desc" id="s4-desc"></div>
-            <button class="btn" onclick="nextSlide()">رؤية كارت التخمين <i class="fa-solid fa-eye"></i></button>
+            <div class="dynamic-instruction" id="s4-text">سيشاهد كارت اللاعب السري الخاص بخصمه لتوجيهه بالأسئلة والمواصفات!</div>
+            <button class="btn-yellow" onclick="goToNextSlide()">رؤية مواصفات اللاعب <i class="fa-solid fa-eye"></i></button>
         </div>
 
-        <!-- شريحة 5 -->
         <div class="slide" id="slide-5">
             <div class="game-layout">
-                <div class="controls-side">
-                    <h3 style="color: var(--primary-color);">محرك بحث اللاعبين (50 لاعب):</h3>
-                    <div class="search-container">
-                        <i class="fa-solid fa-magnifying-glass search-icon"></i>
-                        <input type="text" class="search-box" id="search-2" placeholder="ابحث باسم اللاعب، النادي أو الجنسية..." oninput="handleSearch(2)">
-                        <div class="suggestions-list" id="suggest-2"></div>
+                <div class="controls-panel">
+                    <div class="panel-title" id="s5-search-title">ابحث عن لاعب لتخصيصه لـ:</div>
+                    <div class="search-wrapper">
+                        <input type="text" class="search-input" id="search-box-2" placeholder="اكتب اسم اللاعب لتغييره..." oninput="triggerSearch(2)">
+                        <i class="fa-solid fa-magnifying-glass"></i>
+                        <div class="suggestions-dropdown" id="drop-2"></div>
                     </div>
-                    <button class="btn btn-secondary" onclick="rerollPlayer(2)"><i class="fa-solid fa-shuffle"></i> لاعب عشوائي آخر</button>
-                    <button class="btn" style="margin-top: auto;" onclick="nextSlide()">حفظت البيانات؟ التالي <i class="fa-solid fa-arrow-left"></i></button>
+                    
+                    <div class="rule-checkbox">
+                        <i class="fa-solid fa-circle-check"></i>
+                        <div>هذا الكرت والاسم مخفي تماماً عن اللاعب الآخر!</div>
+                    </div>
+                    <div class="rule-checkbox">
+                        <i class="fa-solid fa-circle-check"></i>
+                        <div>دعه يسألك أسئلة إجابتها "نعم" أو "لا" فقط.</div>
+                    </div>
+                    <div class="rule-checkbox">
+                        <i class="fa-solid fa-circle-check"></i>
+                        <div>استخدم الصورة والمواصفات المعروضة لتوجيهه بذكاء.</div>
+                    </div>
+
+                    <button class="btn-outline" style="margin-top: 15px;" onclick="generateRandomCard(2)"><i class="fa-solid fa-shuffle"></i> لاعب عشوائي آخر</button>
                 </div>
-                
-                <div class="display-side">
-                    <div class="player-image-wrapper">
-                        <div class="fallback-avatar" id="fallback-2"><i class="fa-solid fa-user-astronaut"></i></div>
-                        <img src="" class="player-image" id="img-2" alt="صورة اللاعب" style="display:none;" onerror="handleImageError(2)">
-                    </div>
-                    <div class="player-name-title" id="name-2"></div>
-                    <div class="info-rows">
-                        <div class="info-row"><strong><i class="fa-solid fa-globe"></i> الجنسية:</strong> <span id="nat-2"></span></div>
-                        <div class="info-row"><strong><i class="fa-solid fa-shirt"></i> النادي/الحالة:</strong> <span id="club-2"></span></div>
-                        <div class="info-row"><strong><i class="fa-solid fa-arrows-up-down-left-right"></i> المركز:</strong> <span id="pos-2"></span></div>
-                        <div class="info-row"><strong><i class="fa-solid fa-star"></i> تلميح ذهبي:</strong> <span id="feat-2"></span></div>
+
+                <div class="card-panel">
+                    <div class="player-avatar-box" id="p-img-box-2">
+                        </div>
+                    <div class="card-player-name" id="p-name-2">ليونيل ميسي</div>
+                    <div class="specs-list">
+                        <div class="spec-item"><strong>🌐 الجنسية:</strong> <span id="p-nat-2"></span></div>
+                        <div class="spec-item"><strong>👕 النادي الحالي:</strong> <span id="p-club-2"></span></div>
+                        <div class="spec-item"><strong>🔀 المركز:</strong> <span id="p-pos-2"></span></div>
+                        <div class="spec-item"><strong>⭐ ميزة مشهورة:</strong> <span id="p-feat-2"></span></div>
                     </div>
                 </div>
             </div>
+            <button class="btn-yellow" style="margin-top: 20px; align-self: flex-start;" onclick="goToNextSlide()">حفظت المواصفات؟ التالي <i class="fa-solid fa-chevron-left"></i></button>
         </div>
 
-        <!-- شريحة 6 -->
         <div class="slide" id="slide-6">
-            <i class="fa-solid fa-trophy" style="font-size: 5rem; color: var(--primary-color); margin-bottom: 20px;"></i>
-            <h1>انتهى إعداد الجولة!</h1>
-            <p style="color: var(--text-muted); font-size: 1.2rem; margin-bottom: 15px;">استمتعوا باللعب والتحدي الآن بمعلومات وتلميحات غنية جداً.</p>
-            <button class="btn" onclick="restartGame()"><i class="fa-solid fa-rotate-right"></i> جولة جديدة بنفس الأسماء</button>
-            <button class="btn btn-secondary" style="margin-top: 10px;" onclick="resetToMain()"><i class="fa-solid fa-user-plus"></i> تغيير الأسماء</button>
+            <i class="fa-solid fa-trophy" style="font-size: 4rem; color: var(--primary-yellow); margin-bottom: 20px;"></i>
+            <h2 style="font-size: 2rem; font-weight: 900; margin-bottom: 15px;">جاهزون للانطلاق!</h2>
+            <p style="color: var(--text-muted); max-width: 500px; line-height: 1.6; margin-bottom: 30px;">الآن بدأ التحدي! يحق لكل منكما البدء في سؤال الآخر بالتناوب لمعرفة من يستطيع تخمين كرت لاعبه أولاً!</p>
+            <button class="btn-yellow" onclick="restartMatch()"><i class="fa-solid fa-rotate-right"></i> جولة جديدة</button>
+            <button class="btn-outline" style="margin-top: 15px;" onclick="backToMain()"><i class="fa-solid fa-user-gear"></i> تعديل الأسماء</button>
         </div>
 
-        <div class="footer-nav">
-            <span id="footer-matchup">تحدي التخمين</span>
-            <span id="footer-step">الشريحة 1 من 6</span>
+        <div class="footer-status">
+            <div class="matchup-badge" id="bottom-matchup">يوسف <span>VS</span> ياسين</div>
+            <div id="bottom-step">الشريحة 1 من 6</div>
         </div>
 
     </div>
 
     <script>
-        // قاعدة البيانات الموسعة والمحدثة بالكامل لـ 50 لاعباً من شتى الفئات والأندية والمنتخبات
-        const playersDatabase = [
-            // النجوم الحاليين وأوروبا
-            { name: "كريستيانو رونالدو", nat: "برتغالي", club: "النصر السعودي", pos: "مهاجم هداف", feat: "صاروخ ماديرا، الهداف التاريخي لكرة القدم وصاحب الـ 5 كرات ذهبية." },
-            { name: "ليونيل ميسي", nat: "أرجنتيني", club: "إنتر ميامي الأمريكي", pos: "صانع ألعاب / جناح أسطوري", feat: "البولغا، الأكثر تتويجاً بالكرات الذهبية (8) وبطل العالم 2022." },
-            { name: "محمد صلاح", nat: "مصري", club: "ليفربول الإنجليزي", pos: "جناح أيمن هداف", feat: "الملك المصري وهداف الريدز التاريخي في الدوري الإنجليزي الممتاز." },
-            { name: "كيليان مبابي", nat: "فرنسي", club: "ريال مدريد الإسباني", pos: "مهاجم سريع", feat: "انتقل للملكي في صفقة القرن وهداف باريس التاريخي وبطل العالم 2018." },
-            { name: "إيرلينج هالاند", nat: "نرويجي", club: "مانشستر سيتي الإنجليزي", pos: "مهاجم صريح غول", feat: "ماكينة أهداف بشرية حطم الأرقام القياسية التاريخية للبريميرليج." },
-            { name: "جود بيلينجهام", nat: "إنجليزي", club: "ريال مدريد الإسباني", pos: "لاعب وسط هجومي", feat: "فاز بالدوري والأبطال مع الملكي ومشهور باحتفالية فتح اليدين." },
-            { name: "فينيسيوس جونيور", nat: "برازيلي", club: "ريال مدريد الإسباني", pos: "جناح أيسر مهارى", feat: "نجم المواعيد الكبرى وسجل في نهائيين لدوري أبطال أوروبا." },
-            { name: "لامين يامال", nat: "إسباني", club: "برشلونة الإسباني", pos: "جناح أيمن معجزة", feat: "أصغر لاعب يسجل ويصنع ويتوج في تاريخ أمم أوروبا (اليورو)." },
-            { name: "كيفين دي بروين", nat: "بلجيكي", club: "مانشستر سيتي الإنجليزي", pos: "صانع ألعاب عبقري", feat: "مهندس التمريرات الحاسمة الخارقة وصاحب الرؤية الأقوى في العالم." },
-            { name: "روبرت ليفاندوفسكي", nat: "بولندي", club: "برشلونة الإسباني", pos: "رأس حربة قناص", feat: "الهداف البولندي التاريخي، صاحب خماسية شهيرة في 9 دقائق مع البايرن." },
-            { name: "هاري كين", nat: "إنجليزي", club: "بايرن ميونخ الألماني", pos: "مهاجم صريح هداف", feat: "الهداف التاريخي لمنتخب إنجلترا ونادي توتنهام والحذاء الذهبي." },
-            { name: "لوكا مودريتش", nat: "كرواتي", club: "ريال مدريد الإسباني", pos: "مايسترو خط الوسط", feat: "ساحر كرواتيا الحائز على الكرة الذهبية 2018 ومهندس وسط الملكي." },
-            { name: "أنتوان جريزمان", nat: "فرنسي", club: "أتلتيكو مدريد الإسباني", pos: "مهاجم / صانع ألعاب", feat: "الهداف التاريخي للروخي بلانكوس وعنصر أساسي في ذهب مونديال 2018." },
-            { name: "برناردو سيلفا", nat: "برتغالي", club: "مانشستر سيتي الإنجليزي", pos: "لاعب وسط / جناح مغناطيسي", feat: "المحرك الذكي لمنظومة بيب جوارديولا ويمتاز بالتحكم الخرافي بالكرة." },
-            { name: "رودري", nat: "إسباني", club: "مانشستر سيتي الإنجليزي", pos: "لاعب وسط دفاعي (ارتكاز)", feat: "ضابط إيقاع السيتي وإسبانيا، وصاحب هدف التتويج التاريخي بأبطال أوروبا 2023." },
-            { name: "بوكايو ساكا", nat: "إنجليزي", club: "آرسنال الإنجليزي", pos: "جناح أيمن سريع", feat: "الفتى المدلل والركيزة الأساسية لمدفعجية لندن والمنتخب الإنجليزي." },
-            { name: "فلوريان فيرتز", nat: "ألماني", club: "باير ليفركوزن الألماني", pos: "صانع ألعاب موهوب", feat: "قاد فريقه لثنائية تاريخية لا هزيمة لها في ألمانيا تحت قيادة تشابي ألونسو." },
-            { name: "جمال موسيالا", nat: "ألماني", club: "بايرن ميونخ الألماني", pos: "لاعب وسط مهارى (مراوغ)", feat: "مراوغ ساحر يلقب بـ 'بامبي' ويمتاز بالتوغل السريع في المساحات الضيقة." },
-            { name: "رافائيل لياو", nat: "برتغالي", club: "ميلان الإيطالي", pos: "جناح أيسر صاروخي", feat: "النفاثة البرتغالية وصاحب المهارة والسرعة المرعبة في الدوري الإيطالي." },
-            { name: "لاوتارو مارتينيز", nat: "أرجنتيني", club: "إنتر ميلان الإيطالي", pos: "مهاجم قناص (التورو)", feat: "قائد الإنتر وهدافه الأبرز، وبطل كوبا أمريكا وكأس العالم مع الأرجنتين." },
-            { name: "باولو ديبالا", nat: "أرجنتيني", club: "روما الإيطالي", pos: "صانع ألعاب / مهاجم ثانٍ", feat: "الـ 'جويا' صاحب القدم اليسرى الساحرة والاحتفالية الشهيرة بالقناع." },
-            { name: "سون هيونج مين", nat: "كوري جنوبي", club: "توتنهام الإنجليزي", pos: "جناح هجومي طائر", feat: "فخر قارة آسيا في البريميرليج والحائز على لقب هداف الدوري سابقاً." },
-
-            // الدوري السعودي والنجوم العرب
-            { name: "رياض محرز", nat: "جزائري", club: "الأهلي السعودي", pos: "جناح أيمن حريف", feat: "كنترول واستلام يدرس في البريميرليج، وبطل أمم أفريقيا 2019." },
-            { name: "كريم بنزيما", nat: "فرنسي", club: "الاتحاد السعودي", pos: "مهاجم صندوق ذكي", feat: "الحائز على الكرة الذهبية 2022، ومشهور بالرباط الطبي على يده." },
-            { name: "ألكسندر ميتروفيتش", nat: "صربي", club: "الهلال السعودي", pos: "رأس حربة دبابة", feat: "الهداف التاريخي لمنتخب صربيا ومرعب حراس المرمى بالرأسيات القوية." },
-            { name: "سالم الدوسري", nat: "سعودي", club: "الهلال السعودي", pos: "جناح أيسر مهارى (التورنيدو)", feat: "أفضل لاعب في آسيا وصاحب الهدف التاريخي ضد الأرجنتين بمونديال 2022." },
-            { name: "ياسين بونو", nat: "مغربي", club: "الهلال السعودي", pos: "حارس مرمى عملاق", feat: "حامي عرين أسود الأطلس وثالث العالم بمونديال قطر، وصاحب قفازات ذهبية." },
-            { name: "أشرف حكيمي", nat: "مغربي", club: "باريس سان جيرمان الفرنسي", pos: "ظهير أيمن طائر", feat: "من أفضل أظهرة العالم يميناً، تميز بسرعته وبطولاته القوية." },
-            { name: "حكيم زياش", nat: "مغربي", club: "غلطة سراي التركي", pos: "جناح / صانع ألعاب حكيم", feat: "صاحب العرضيات والتسديدات المقوسة الخرافية بالقدم اليسرى." },
-            { name: "ساديو ماني", nat: "سنغالي", club: "النصر السعودي", pos: "جناح هجومي سريع", feat: "بطل أفريقيا مع السنغال وأسطورة ليفربول السابق وصاحب الجوائز الخيرية." },
-            { name: "نيمار جونيور", nat: "برازيلي", club: "الهلال السعودي", pos: "ساحر مهارى / صانع ألعاب", feat: "الهداف التاريخي لمنتخب البرازيل متخطياً بيليه، وأمهر لاعبي جيله." },
-            { name: "نجولو كانتي", nat: "فرنسي", club: "الاتحاد السعودي", pos: "محور ارتكاز (رئة الفريق)", feat: "اللاعب المحبوب عالمياً الذي يغطي كل إنش في الملعب وبطل مونديال 2018." },
-            { name: "رياض بودبوز", nat: "جزائري", club: "شبيبة القبائل (سابقاً الأهلي)", pos: "صانع ألعاب كلاسيكي", feat: "تمريرات ساحرة وخبرة عريضة في الملاعب الفرنسية والسعودية." },
-            { name: "بغداد بونجاح", nat: "جزائري", club: "الشمال القطري (سابقاً السد)", pos: "مهاجم قناص", feat: "صاحب هدف تتويج الجزائر بأمم أفريقيا 2019 وهداف تاريخي للسد." },
-
-            // حراس ودفاع وعمالقة
-            { name: "تيبو كورتوا", nat: "بلجيكي", club: "ريال مدريد الإسباني", pos: "حارس مرمى جدار برلين", feat: "رجل نهائي أبطال أوروبا 2022 بتصديات إعجازية قادت الملكي للقب." },
-            { name: "أليسون بيكر", nat: "برازيلي", club: "ليفربول الإنجليزي", pos: "حارس مرمى منقذ", feat: "حامي عرين ليفربول وصاحب الهدف الرأسي الشهير الذي أهلهم للأبطال." },
-            { name: "فيرجيل فان دايك", nat: "هولندي", club: "ليفربول الإجنليزي", pos: "صخرة الدفاع", feat: "قائد ليفربول وهولندا، ومن المدافعين القلائل الذين نافسوا على الكرة الذهبية." },
-            { name: "أنطونيو روديجر", nat: "ألماني", club: "ريال مدريد الإسباني", pos: "مدافع صلب (المقاتل)", feat: "مدافع شرس ومحبوب بلقطاته الطريفة وحصنه الدفاعي المنيع." },
-            { name: "ألفونسو ديفيز", nat: "كندي", club: "بايرن ميونخ الألماني", pos: "ظهير أيسر نفاثة", feat: "من أسرع لاعبي الكوكب وحقق السداسية التاريخية مع البايرن." },
-
-            // الأساطير والمعتزلين مؤخراً
-            { name: "زين الدين زيدان", nat: "فرنسي", club: "معتزل (أسطورة التاريخ)", pos: "صانع ألعاب ساحر (زيزو)", feat: "بطل مونديال 1998 وصاحب الفوليه الشهير في نهائي أبطال أوروبا 2002." },
-            { name: "رونالدينيو", nat: "برازيلي", club: "معتزل (ساحر الابتسامة)", pos: "جناح / صانع ألعاب مهاري", feat: "ملك المتعة والمراوغات الراقصة، نال تحية جماهير البيرنابيو وهو برشلوني." },
-            { name: "ظاهرة رونالدو", nat: "برازيلي", club: "معتزل (الظاهرة R9)", pos: "مهاجم مرعب لا يصد", feat: "المرواغ البرازيلي الأقوى وبطل كأس العالم 2002 وهدافها المرعب." },
-            { name: "دييجو مارادونا", nat: "أرجنتيني", club: "أسطورة تاريخية (رحل)", pos: "صانع ألعاب أسطوري", feat: "صاحب كرت القرن والمونديال التاريخي 1986 بمفرده تقريباً." },
-            { name: "بيليه", nat: "برازيلي", club: "أسطورة تاريخية (رحل)", pos: "مهاجم / جوهرة سوداء", feat: "الوحيد في التاريخ الفائز بـ 3 كؤوس عالم للera القديمة." },
-            { name: "تييري هنري", nat: "فرنسي", club: "معتزل (الغزال الأسمر)", pos: "مهاجم / جناح هداف", feat: "الهداف التاريخي لآرسنال وقائد جيل اللاهزيمة الذهبي في البريميرليج." },
-            { name: "زلاتان إبراهيموفيتش", nat: "سويدي", club: "معتزل (السلطان)", pos: "مهاجم صريح عملاق", feat: "صاحب الأهداف الأكروباتية والإعجازية وصاحب التصريحات النرجسية الساخرة." },
-            { name: "أندريس إنييستا", nat: "إسباني", club: "معتزل (الرسام)", pos: "لاعب وسط عبقري", feat: "مسجل هدف تتويج إسبانيا بكأس العالم 2010 والمهندس الروحي لبرشلونة." },
-            { name: "تشافي هيرنانديز", nat: "إسباني", club: "معتزل (الكمبيوتر)", pos: "مهندس خط الوسط", feat: "ملك التمرير القصير والدوران بالكرة (الـ 360 درجة) وضابط إيقاع التيكي تاكا." },
-            { name: "سيرجيو راموس", nat: "إسباني", club: "مدافع حر (أسطورة الـ 90)", pos: "مدافع هداف وقائد صلب", feat: "صاحب رأسية العاشرة الشهيرة في الدقيقة 92:48 مع ريال مدريد." },
-            { name: "ريكاردو كاكا", nat: "برازيلي", club: "معتزل (أمير ميلان)", pos: "لاعب وسط هجومي أنيق", feat: "الحائز على الكرة الذهبية 2007 وصاحب الانطلاقات الطولية الفتاكة بالكرة." }
+        // قاعدة البيانات الكاملة مع روابط حقيقية للصور لضمان المظهر الفخم والاحترافي
+        const masterPlayersList = [
+            { name: "كريستيانو رونالدو", nat: "برتغالي", club: "النصر السعودي", pos: "مهاجم هداف (صاروخ ماديرا)", feat: "الهداف التاريخي لكرة القدم وللمنتخبات وصاحب الـ 5 كرات ذهبية.", img: "https://images.unsplash.com/photo-1622279457486-62dcc4a4dae3?w=400&auto=format&fit=crop&q=60" },
+            { name: "ليونيل ميسي", nat: "أرجنتيني", club: "إنتر ميامي الأمريكي", pos: "جناح / صانع ألعاب أسطوري", feat: "الأكثر تتويجاً بالكرات الذهبية (8) وبطل العالم التاريخي 2022.", img: "https://images.unsplash.com/photo-1518063319789-7217e6706b04?w=400&auto=format&fit=crop&q=60" },
+            { name: "محمد صلاح", nat: "مصري", club: "ليفربول الإنجليزي", pos: "جناح أيمن هداف", feat: "الملك المصري وحطم كل الأرقام القياسية التاريخية لنادي ليفربول.", img: "https://images.unsplash.com/photo-1508098682722-e99c43a406b2?w=400&auto=format&fit=crop&q=60" },
+            { name: "كيليان مبابي", nat: "فرنسي", club: "ريال مدريد الإسباني", pos: "مهاجم سريع جداً", feat: "بطل العالم 2018 وهداف باريس التاريخي وانتقل للملكي بصفقة مدوية.", img: "https://images.unsplash.com/photo-1543351611-58f69d7c1781?w=400&auto=format&fit=crop&q=60" },
+            { name: "ظاهرة رونالدو", nat: "برازيلي", club: "معتزل (الظاهرة R9)", pos: "مهاجم مرعب لا يصد", feat: "المراوغ البرازيلي الأقوى وبطل كأس العالم 2002 وهدافها المرعب.", img: "https://images.unsplash.com/photo-1511886929837-354d827aae26?w=400&auto=format&fit=crop&q=60" },
+            { name: "إيرلينج هالاند", nat: "نرويجي", club: "مانشستر سيتي الإنجليزي", pos: "مهاجم صريح غول", feat: "ماكينة أهداف بشرية حطم الرقم القياسي للأهداف بموسم واحد بالبريميرليج.", img: "https://images.unsplash.com/photo-1577223625856-745e11ff5a4a?w=400&auto=format&fit=crop&q=60" },
+            { name: "جود بيلينجهام", nat: "إنجليزي", club: "ريال مدريد الإسباني", pos: "لاعب وسط هجومي", feat: "فاز بجائزة الفتى الذهبي ويمتاز باحتفاليته الشهيرة بفتح ذراعيه أمام الجماهير.", img: "https://images.unsplash.com/photo-1517649763962-0c623066013b?w=400&auto=format&fit=crop&q=60" },
+            { name: "فينيسيوس جونيور", nat: "برازيلي", club: "ريال مدريد الإسباني", pos: "جناح أيسر مهارى", feat: "نجم المواعيد الكبرى وصاحب أهداف حسم دوري أبطال أوروبا للملكي.", img: "https://images.unsplash.com/photo-1504305754058-2f08cdf28f0d?w=400&auto=format&fit=crop&q=60" },
+            { name: "لامين يامال", nat: "إسباني", club: "برشلونة الإسباني", pos: "جناح أيمن معجزة", feat: "أصغر لاعب يسجل ويصنع ويتوج في تاريخ بطولات أمم أوروبا.", img: "https://images.unsplash.com/photo-1606167668584-78701c57f13d?w=400&auto=format&fit=crop&q=60" },
+            { name: "كيفين دي بروين", nat: "بلجيكي", club: "مانشستر سيتي الإنجليزي", pos: "صانع ألعاب عبقري", feat: "ملك الأسيستات والتمريرات الحاسمة الخارقة للعادة ورؤية الملعب.", img: "https://images.unsplash.com/photo-1522771739844-6a9f6d5f14af?w=400&auto=format&fit=crop&q=60" },
+            { name: "روبرت ليفاندوفسكي", nat: "بولندي", club: "برشلونة الإسباني", pos: "رأس حربة هداف", feat: "صاحب الـ 5 أهداف الشهيرة في 9 دقائق فقط بالدوري الألماني سابقاً.", img: "https://images.unsplash.com/photo-1560272564-c83b66b1ad12?w=400&auto=format&fit=crop&q=60" },
+            { name: "كريم بنزيما", nat: "فرنسي", club: "الاتحاد السعودي", pos: "مهاجم صندوق ذكي", feat: "الحائز على الكرة الذهبية لعام 2022 ومشهور برباط يده الطبي الشهير.", img: "https://images.unsplash.com/photo-1551958219-acbc608c6377?w=400&auto=format&fit=crop&q=60" },
+            { name: "رياض محرز", nat: "جزائري", club: "الأهلي السعودي", pos: "جناح أيمن حريف", feat: "صاحب أفضل استلام وكنترول مغناطيسي للكرة في تاريخ البريميرليج.", img: "https://images.unsplash.com/photo-1579952363873-27f3bade9f55?w=400&auto=format&fit=crop&q=60" },
+            { name: "سالم الدوسري", nat: "سعودي", club: "الهلال السعودي", pos: "جناح أيسر (التورنيدو)", feat: "أفضل لاعب في آسيا وصاحب الهدف التاريخي الشهير ضد الأرجنتين بمونديال قطر.", img: "https://images.unsplash.com/photo-1431324155629-1a6eda1ec26a?w=400&auto=format&fit=crop&q=60" },
+            { name: "ياسين بونو", nat: "مغربي", club: "الهلال السعودي", pos: "حارس مرمى عملاق", feat: "حامي عرين أسود الأطلس برابع العالم وهداف التصديات الأسطورية.", img: "https://images.unsplash.com/photo-1516738901171-8eb4fc13bd20?w=400&auto=format&fit=crop&q=60" },
+            { name: "لوكا مودريتش", nat: "كرواتي", club: "ريال مدريد الإسباني", pos: "مايسترو وسط الميدان", feat: "قائد كرواتيا التاريخي وحاصل على بالون دور 2018 ومهندس ريتم الملكي.", img: "https://images.unsplash.com/photo-1518605333140-552e4b37512d?w=400&auto=format&fit=crop&q=60" },
+            { name: "أشرف حكيمي", nat: "مغربي", club: "باريس سان جيرمان الفرنسي", pos: "ظهير أيمن طائر", feat: "من أسرع وأقوى الأظهرة في العالم وقاد المغرب لإنجاز المونديال.", img: "https://images.unsplash.com/photo-1510566337590-2fc1f21d0faa?w=400&auto=format&fit=crop&q=60" },
+            { name: "ساديو ماني", nat: "سنغالي", club: "النصر السعودي", pos: "جناح هجومي مرعب", feat: "بطل أفريقيا مع السنغال وضلع مثلث ليفربول المرعب سابقاً.", img: "https://images.unsplash.com/photo-1568194157720-8eae79a8d75a?w=400&auto=format&fit=crop&q=60" },
+            { name: "نيمار جونيور", nat: "برازيلي", club: "الهلال السعودي", pos: "ساحر مهارى / صانع ألعاب", feat: "الهداف التاريخي لمنتخب السامبا متخطياً الأسطورة بيليه.", img: "https://images.unsplash.com/photo-1508098682722-e99c43a406b2?w=400&auto=format&fit=crop&q=60" },
+            { name: "نجولو كانتي", nat: "فرنسي", club: "الاتحاد السعودي", pos: "محور ارتكاز دفاعي", feat: "اللاعب المحبوب عالمياً صاحب الرئتين القادر على تغطية الملعب كاملاً.", img: "https://images.unsplash.com/photo-1529900748604-07564a03e7a6?w=400&auto=format&fit=crop&q=60" },
+            { name: "فيرجيل فان دايك", nat: "هولندي", club: "ليفربول الإنجليزي", pos: "صخرة الدفاع", feat: "قائد الريدز الصلب ومن أفضل المدافعين الحاصلين على جوائز فردية كبرى.", img: "https://images.unsplash.com/photo-1551958219-acbc608c6377?w=400&auto=format&fit=crop&q=60" },
+            { name: "زين الدين زيدان", nat: "فرنسي", club: "معتزل (أسطورة)", pos: "صانع ألعاب كلاسيكي ساحر", feat: "صاحب الفوليه الإعجازي في نهائي 2002 وبطل كأس العالم 1998.", img: "https://images.unsplash.com/photo-1518063319789-7217e6706b04?w=400&auto=format&fit=crop&q=60" },
+            { name: "رونالدينيو", nat: "برازيلي", club: "معتزل (ساحر الابتسامة)", pos: "لاعب مهارى حر", feat: "ملك المتعة الكروية والمراوغات الإبداعية الراقصة الحائز على تصفيق الخصوم.", img: "https://images.unsplash.com/photo-1511886929837-354d827aae26?w=400&auto=format&fit=crop&q=60" },
+            { name: "تيري هنري", nat: "فرنسي", club: "معتزل (الغزال الأسمر)", pos: "مهاجم / جناح أسطوري", feat: "الهداف التاريخي لأرسنال وقائد جيل اللاهزيمة الذهبي في البريميرليج.", img: "https://images.unsplash.com/photo-1543351611-58f69d7c1781?w=400&auto=format&fit=crop&q=60" },
+            { name: "أندريس إنييستا", nat: "إسباني", club: "معتزل (الرسام)", pos: "لاعب وسط عبقري", feat: "مسجل هدف تتويج إسبانيا بكأس العالم 2010 والمهندس الروحي لبرشلونة.", img: "https://images.unsplash.com/photo-1606167668584-78701c57f13d?w=400&auto=format&fit=crop&q=60" }
         ];
 
-        let player1Name = "يوسف";
-        let player2Name = "ياسين";
-        let currentSlide = 1;
-        let p1CardPlayer = null; 
-        let p2CardPlayer = null; 
+        let p1Name = "يوسف";
+        let p2Name = "ياسين";
+        let activeSlideIndex = 1;
+        let selectedPlayerCard1 = null;
+        let selectedPlayerCard2 = null;
 
-        function updateFooter() {
-            document.getElementById('footer-step').innerText = `الشريحة ${currentSlide} من 6`;
-            document.getElementById('footer-matchup').innerText = currentSlide > 1 ? `${player1Name} 🆚 ${player2Name}` : "تحدي التخمين";
+        function refreshFooterUI() {
+            document.getElementById('bottom-step').innerText = `الشريحة ${activeSlideIndex} من 6`;
+            document.getElementById('bottom-matchup').innerHTML = `${p1Name} <span>VS</span> ${p2Name}`;
         }
 
-        function setPlayerCard(cardNumber, playerObj) {
-            if (cardNumber === 1) p2CardPlayer = playerObj; 
-            if (cardNumber === 2) p1CardPlayer = playerObj; 
+        function populateCardData(cardNumber, playerObj) {
+            if (cardNumber === 1) selectedPlayerCard2 = playerObj; 
+            if (cardNumber === 2) selectedPlayerCard1 = playerObj; 
 
-            document.getElementById(`name-${cardNumber}`).innerText = playerObj.name;
-            document.getElementById(`nat-${cardNumber}`).innerText = playerObj.nat;
-            document.getElementById(`club-${cardNumber}`).innerText = playerObj.club;
-            document.getElementById(`pos-${cardNumber}`).innerText = playerObj.pos;
-            document.getElementById(`feat-${cardNumber}`).innerText = playerObj.feat;
+            document.getElementById(`p-name-${cardNumber}`).innerText = playerObj.name;
+            document.getElementById(`p-nat-${cardNumber}`).innerText = playerObj.nat;
+            document.getElementById(`p-club-${cardNumber}`).innerText = playerObj.club;
+            document.getElementById(`p-pos-${cardNumber}`).innerText = playerObj.pos;
+            document.getElementById(`p-feat-${cardNumber}`).innerText = playerObj.feat;
 
-            const imgEl = document.getElementById(`img-${cardNumber}`);
-            const fallbackEl = document.getElementById(`fallback-${cardNumber}`);
-            
-            imgEl.style.display = 'none';
-            fallbackEl.style.display = 'flex';
+            const imgBox = document.getElementById(`p-img-box-${cardNumber}`);
+            imgBox.innerHTML = ""; 
 
-            // توليد أفاتار رقمي فوري حديث بألوان وتصميم رائع
-            imgEl.src = `https://api.dicebear.com/7.x/initials/svg?seed=${encodeURIComponent(playerObj.name)}&backgroundType=gradientLinear&chars=2&fontSize=45`;
-
-            imgEl.onload = () => {
-                imgEl.style.display = 'block';
-                fallbackEl.style.display = 'none';
-            };
-        }
-
-        function handleImageError(cardNumber) {
-            document.getElementById(`img-${cardNumber}`).style.display = 'none';
-            document.getElementById(`fallback-${cardNumber}`).style.display = 'flex';
-        }
-
-        function handleSearch(cardNumber) {
-            const query = document.getElementById(`search-${cardNumber}`).value.trim();
-            const suggestEl = document.getElementById(`suggest-${cardNumber}`);
-            suggestEl.innerHTML = "";
-            
-            if(query === "") { suggestEl.style.display = "none"; return; }
-
-            const filtered = playersDatabase.filter(p => p.name.includes(query) || p.club.includes(query) || p.nat.includes(query));
-            if(filtered.length === 0) { suggestEl.style.display = "none"; return; }
-
-            suggestEl.style.display = "block";
-            filtered.forEach(player => {
-                const item = document.createElement('div');
-                item.className = 'suggestion-item';
-                item.innerText = `${player.name} (${player.club} - ${player.nat})`;
-                item.onclick = () => {
-                    setPlayerCard(cardNumber, player);
-                    suggestEl.style.display = "none";
-                    document.getElementById(`search-${cardNumber}`).value = "";
-                };
-                suggestEl.appendChild(item);
-            });
-        }
-
-        function rerollPlayer(cardNumber) {
-            let currentNames = [p1CardPlayer ? p1CardPlayer.name : "", p2CardPlayer ? p2CardPlayer.name : ""];
-            let available = playersDatabase.filter(p => !currentNames.includes(p.name));
-            if(available.length > 0) {
-                let randomPlayer = available[Math.floor(Math.random() * available.length)];
-                setPlayerCard(cardNumber, randomPlayer);
+            // محرك عرض الصور: يحمل صورة حقيقية أو يبني كارت جرافيكي بحروف الاسم كبديل أنيق
+            if (playerObj.img && playerObj.img.trim() !== "") {
+                const imgEl = document.createElement('img');
+                imgEl.src = playerObj.img;
+                imgEl.alt = playerObj.name;
+                imgBox.appendChild(imgEl);
+            } else {
+                const fallbackCard = document.createElement('div');
+                fallbackCard.className = 'custom-avatar';
+                fallbackCard.innerText = playerObj.name.substring(0, 2);
+                imgBox.appendChild(fallbackCard);
             }
         }
 
-        function fillSetupSlides() {
-            document.getElementById('s2-title').innerText = player1Name;
-            document.getElementById('s2-alert').innerText = player2Name;
-            document.getElementById('s2-desc').innerText = `الآن ${player1Name} سيشاهد في الشريحة التالية كارت لاعب ${player2Name} السري لتوجيهه بالأسئلة!`;
+        function triggerSearch(cardNumber) {
+            const query = document.getElementById(`search-box-${cardNumber}`).value.trim();
+            const dropEl = document.getElementById(`drop-${cardNumber}`);
+            dropEl.innerHTML = "";
 
-            document.getElementById('s4-title').innerText = player2Name;
-            document.getElementById('s4-alert').innerText = player1Name;
-            document.getElementById('s4-desc').innerText = `الآن ${player2Name} سيشاهد في الشريحة التالية كارت لاعب ${player1Name} السري لتوجيهه بالأسئلة!`;
+            if (query === "") { dropEl.style.display = "none"; return; }
+
+            const filtered = masterPlayersList.filter(p => p.name.includes(query) || p.club.includes(query));
+            if (filtered.length === 0) { dropEl.style.display = "none"; return; }
+
+            dropEl.style.display = "block";
+            filtered.forEach(player => {
+                const item = document.createElement('div');
+                item.className = 'suggest-item';
+                item.innerText = `${player.name} (${player.club})`;
+                item.onclick = () => {
+                    populateCardData(cardNumber, player);
+                    dropEl.style.display = "none";
+                    document.getElementById(`search-box-${cardNumber}`).value = "";
+                };
+                dropEl.appendChild(item);
+            });
         }
 
-        function startGame() {
-            player1Name = document.getElementById('p1-input').value.trim() || "يوسف";
-            player2Name = document.getElementById('p2-input').value.trim() || "ياسين";
-
-            let idx1 = Math.floor(Math.random() * playersDatabase.length);
-            let idx2 = Math.floor(Math.random() * playersDatabase.length);
-            while(idx1 === idx2) idx2 = Math.floor(Math.random() * playersDatabase.length);
-
-            setPlayerCard(1, playersDatabase[idx2]); 
-            setPlayerCard(2, playersDatabase[idx1]); 
-
-            fillSetupSlides();
-            nextSlide();
+        function generateRandomCard(cardNumber) {
+            let currentNames = [selectedPlayerCard1 ? selectedPlayerCard1.name : "", selectedPlayerCard2 ? selectedPlayerCard2.name : ""];
+            let pool = masterPlayersList.filter(p => !currentNames.includes(p.name));
+            if (pool.length > 0) {
+                let rand = pool[Math.floor(Math.random() * pool.length)];
+                populateCardData(cardNumber, rand);
+            }
         }
 
-        function nextSlide() {
-            document.getElementById(`slide-${currentSlide}`).classList.remove('active');
-            currentSlide++;
-            document.getElementById(`slide-${currentSlide}`).classList.add('active');
-            updateFooter();
+        function prepareDynamicTexts() {
+            document.getElementById('s2-active-player').innerText = p1Name;
+            document.getElementById('s2-target-player').innerText = p2Name;
+            document.getElementById('s3-search-title').innerText = `ابحث عن لاعب لتخصيصه لـ ${p2Name}:`;
+
+            document.getElementById('s4-active-player').innerText = p2Name;
+            document.getElementById('s4-target-player').innerText = p1Name;
+            document.getElementById('s5-search-title').innerText = `ابحث عن لاعب لتخصيصه لـ ${p1Name}:`;
         }
 
-        function restartGame() {
-            document.getElementById(`slide-${currentSlide}`).classList.remove('active');
-            currentSlide = 2;
-            startGame();
-            document.getElementById(`slide-${currentSlide}`).classList.add('active');
+        function initGame() {
+            p1Name = document.getElementById('name-p1').value.trim() || "يوسف";
+            p2Name = document.getElementById('name-p2').value.trim() || "ياسين";
+
+            let i1 = Math.floor(Math.random() * masterPlayersList.length);
+            let i2 = Math.floor(Math.random() * masterPlayersList.length);
+            while (i1 === i2) i2 = Math.floor(Math.random() * masterPlayersList.length);
+
+            populateCardData(1, masterPlayersList[i2]);
+            populateCardData(2, masterPlayersList[i1]);
+
+            prepareDynamicTexts();
+            goToNextSlide();
         }
 
-        function resetToMain() {
-            document.getElementById(`slide-${currentSlide}`).classList.remove('active');
-            currentSlide = 1;
-            document.getElementById(`slide-${currentSlide}`).classList.add('active');
-            updateFooter();
+        function goToNextSlide() {
+            document.getElementById(`slide-${activeSlideIndex}`).classList.remove('active');
+            activeSlideIndex++;
+            document.getElementById(`slide-${activeSlideIndex}`).classList.add('active');
+            refreshFooterUI();
+        }
+
+        function restartMatch() {
+            document.getElementById(`slide-${activeSlideIndex}`).classList.remove('active');
+            activeSlideIndex = 2;
+            initGame();
+            document.getElementById(`slide-${activeSlideIndex}`).classList.add('active');
+        }
+
+        function backToMain() {
+            document.getElementById(`slide-${activeSlideIndex}`).classList.remove('active');
+            activeSlideIndex = 1;
+            document.getElementById(`slide-${activeSlideIndex}`).classList.add('active');
+            refreshFooterUI();
         }
 
         document.addEventListener('click', function(e) {
-            if(!e.target.classList.contains('search-box')) {
-                document.getElementById('suggest-1').style.display = "none";
-                document.getElementById('suggest-2').style.display = "none";
+            if (!e.target.classList.contains('search-input')) {
+                document.getElementById('drop-1').style.display = "none";
+                document.getElementById('drop-2').style.display = "none";
             }
         });
     </script>
