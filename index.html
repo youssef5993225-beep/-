@@ -2,7 +2,7 @@
 <html lang="ar" dir="rtl">
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>تحدي تخمين اللاعبين الأسطوري</title>
     <link href="https://fonts.googleapis.com/css2?family=Cairo:wght@400;600;700;900&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
@@ -16,7 +16,6 @@
             --border-gold: #f1c40f;
             --text-main: #ffffff;
             --text-muted: #95a5a6;
-            --danger-red: #e74c3c;
         }
 
         * {
@@ -24,30 +23,29 @@
             margin: 0;
             padding: 0;
             font-family: 'Cairo', sans-serif;
-            -webkit-tap-highlight-color: transparent;
         }
 
         body {
-            background-color: var(--bg-color);
+            background-color: #1a2634; /* لون الخلفية المحيطة من الصور */
             color: var(--text-main);
             min-height: 100vh;
             display: flex;
             justify-content: center;
             align-items: center;
-            padding: 15px;
+            padding: 20px;
         }
 
-        /* حاوية البرنامج الرئيسية - نفس إطار الصورة الذهبي الرفيع والأركان المنحنية */
+        /* حاوية البرنامج الرئيسية - نفس إطار وتصميم صورك */
         .app-container {
             width: 100%;
-            max-width: 1000px;
-            background-color: #0d1b2a;
-            border: 2px solid var(--border-gold);
-            border-radius: 16px;
-            padding: 30px;
-            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.7);
+            max-width: 950px;
+            background-color: #111e2e;
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            border-radius: 24px;
+            padding: 40px;
+            box-shadow: 0 15px 35px rgba(0, 0, 0, 0.5);
             position: relative;
-            min-height: 550px;
+            min-height: 600px;
             display: flex;
             flex-direction: column;
             justify-content: space-between;
@@ -55,7 +53,6 @@
 
         .slide {
             display: none;
-            animation: fadeIn 0.3s ease forwards;
             flex-grow: 1;
             flex-direction: column;
             justify-content: center;
@@ -67,82 +64,88 @@
             display: flex;
         }
 
-        @keyframes fadeIn {
-            from { opacity: 0; transform: scale(0.98); }
-            to { opacity: 1; transform: scale(1); }
-        }
-
-        /* شاشة الحظر (غمض عينك) */
-        .step-header {
-            font-size: 1.6rem;
-            font-weight: 700;
-            color: var(--text-main);
-            align-self: flex-start;
-            margin-bottom: 20px;
-            border-right: 4px solid var(--primary-yellow);
-            padding-right: 10px;
-        }
-
-        .huge-player-name {
-            font-size: 4rem;
-            font-weight: 900;
-            color: var(--primary-yellow);
-            margin: 30px 0;
-            text-shadow: 0 0 10px rgba(241, 196, 15, 0.2);
-        }
-
-        .alert-pill {
-            background: rgba(231, 76, 60, 0.1);
-            border: 1px dashed var(--danger-red);
-            padding: 12px 30px;
-            border-radius: 50px;
-            font-size: 1.3rem;
-            font-weight: 700;
-            color: #ff6b6b;
-            margin-bottom: 30px;
-            display: inline-flex;
-            align-items: center;
-            gap: 10px;
-        }
-
-        .alert-pill span {
-            color: var(--primary-yellow);
-        }
-
-        .dynamic-instruction {
-            font-size: 1.15rem;
-            color: var(--text-main);
-            margin-bottom: 40px;
-            font-weight: 600;
-            text-align: center;
-        }
-
-        /* شاشة عرض الكارت والتحكم - النصفين الطوليين كما في الصور */
+        /* تخطيط شاشة اللعب - الكارت يمين والبحث يسار كما في الصور تماماً */
         .game-layout {
             display: flex;
             width: 100%;
-            gap: 20px;
-            align-items: stretch;
+            gap: 40px;
+            align-items: flex-start;
         }
 
-        /* الجانب الأيمن: التحكم والبحث */
-        .controls-panel {
-            flex: 1;
-            background-color: rgba(255, 255, 255, 0.02);
-            border: 1px solid rgba(255, 255, 255, 0.05);
-            border-radius: 14px;
-            padding: 20px;
+        /* الجانب الأيمن: كارت اللاعب الكبير الفخم */
+        .card-panel {
+            flex: 1.1;
+            background-color: #162534;
+            border-radius: 18px;
+            padding: 25px;
             display: flex;
             flex-direction: column;
-            gap: 15px;
+            border: 1px solid rgba(255, 255, 255, 0.05);
+            text-align: right;
+        }
+
+        .player-avatar-box {
+            width: 100%;
+            height: 250px;
+            background: #0b1520;
+            border-radius: 12px;
+            margin-bottom: 20px;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            overflow: hidden;
+            border: 1px solid rgba(255, 255, 255, 0.1);
+        }
+
+        .player-avatar-box img {
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+        }
+
+        .card-player-name {
+            font-size: 2.2rem;
+            font-weight: 900;
+            color: var(--primary-yellow);
+            margin-bottom: 20px;
+            text-align: center;
+        }
+
+        .specs-list {
+            width: 100%;
+            display: flex;
+            flex-direction: column;
+            gap: 14px;
+        }
+
+        .spec-item {
+            font-size: 1.1rem;
+            line-height: 1.6;
+            color: #fff;
+        }
+
+        .spec-item strong {
+            color: var(--text-main);
+            font-weight: 700;
+        }
+
+        .spec-item span {
+            color: #d1d5db;
+        }
+
+        /* الجانب الأيسر: لوحة التحكم والبحث والتوجيهات */
+        .controls-panel {
+            flex: 0.9;
+            display: flex;
+            flex-direction: column;
+            gap: 20px;
             text-align: right;
         }
 
         .panel-title {
             color: var(--primary-yellow);
-            font-size: 1.15rem;
+            font-size: 1.3rem;
             font-weight: 700;
-            margin-bottom: 5px;
         }
 
         .search-wrapper {
@@ -152,13 +155,12 @@
 
         .search-input {
             width: 100%;
-            padding: 12px 15px 12px 40px;
-            background: #162639;
+            padding: 14px 15px 14px 45px;
+            background: #162534;
             border: 1px solid rgba(255, 255, 255, 0.1);
-            border-radius: 8px;
+            border-radius: 10px;
             color: #fff;
-            font-size: 1rem;
-            font-weight: 600;
+            font-size: 1.05rem;
             text-align: right;
         }
 
@@ -173,6 +175,7 @@
             top: 50%;
             transform: translateY(-50%);
             color: var(--text-muted);
+            font-size: 1.2rem;
         }
 
         .suggestions-dropdown {
@@ -190,10 +193,11 @@
         }
 
         .suggest-item {
-            padding: 10px 15px;
+            padding: 12px 15px;
             cursor: pointer;
             border-bottom: 1px solid rgba(255, 255, 255, 0.05);
-            font-size: 0.95rem;
+            font-size: 1rem;
+            text-align: right;
         }
 
         .suggest-item:hover {
@@ -201,133 +205,47 @@
             color: #000;
         }
 
-        .rule-checkbox {
-            display: flex;
-            align-items: flex-start;
-            gap: 10px;
+        .db-info-text {
             font-size: 0.95rem;
-            color: var(--text-main);
-            line-height: 1.4;
-        }
-
-        .rule-checkbox i {
-            color: var(--primary-yellow);
-            margin-top: 3px;
-        }
-
-        /* الجانب الأيسر: كارت اللاعب الكبير الفخم */
-        .card-panel {
-            flex: 1;
-            background-color: var(--card-dark);
-            border-radius: 14px;
-            padding: 20px;
-            display: flex;
-            flex-direction: column;
-            align-items: center;
-            border: 1px solid rgba(255, 255, 255, 0.05);
-        }
-
-        .player-avatar-box {
-            width: 100%;
-            height: 220px;
-            background: linear-gradient(180deg, #162639, #0d1b2a);
-            border-radius: 10px;
-            margin-bottom: 15px;
-            display: flex;
-            justify-content: center;
-            align-items: center;
-            overflow: hidden;
-            border: 1px solid rgba(255, 255, 255, 0.1);
-        }
-
-        .player-avatar-box img {
-            width: 100%;
-            height: 100%;
-            object-fit: cover;
-        }
-
-        /* في حال كانت الصورة عبارة عن كارت مخصص مبني برمجياً */
-        .player-avatar-box .custom-avatar {
-            width: 100%;
-            height: 100%;
-            display: flex;
-            justify-content: center;
-            align-items: center;
-            font-size: 3.5rem;
-            font-weight: 900;
-            color: #fff;
-            background: linear-gradient(135deg, #6a11cb 0%, #2575fc 100%);
-        }
-
-        .card-player-name {
-            font-size: 1.8rem;
-            font-weight: 900;
-            color: var(--primary-yellow);
-            margin-bottom: 15px;
-            text-align: center;
-        }
-
-        .specs-list {
-            width: 100%;
-            display: flex;
-            flex-direction: column;
-            gap: 12px;
-            text-align: right;
-        }
-
-        .spec-item {
-            font-size: 1rem;
+            color: var(--text-muted);
             line-height: 1.5;
         }
 
-        .spec-item strong {
-            color: var(--text-muted);
+        /* الأزرار المطابقة لألوان وأشكال التصميم القديم */
+        .btn-random {
+            background: #202f41;
+            color: #fff;
+            border: none;
+            padding: 14px;
+            font-size: 1.1rem;
             font-weight: 600;
-            display: inline-block;
-            min-width: 90px;
+            border-radius: 30px;
+            cursor: pointer;
+            width: 100%;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            gap: 10px;
         }
 
-        /* الأزرار الدائرية الكبيرة باللون الأصفر */
-        .btn-yellow {
+        .btn-yellow-submit {
             background-color: var(--primary-yellow);
             color: #000;
             border: none;
-            padding: 14px 40px;
-            font-size: 1.15rem;
+            padding: 14px;
+            font-size: 1.2rem;
             font-weight: 700;
-            border-radius: 50px;
+            border-radius: 30px;
             cursor: pointer;
-            box-shadow: 0 4px 15px rgba(241, 196, 15, 0.3);
-            display: inline-flex;
-            align-items: center;
-            gap: 10px;
-            transition: all 0.2s;
-        }
-
-        .btn-yellow:hover {
-            background-color: var(--primary-hover);
-            transform: translateY(-1px);
-        }
-
-        .btn-outline {
-            background: transparent;
-            color: #fff;
-            border: 1px solid rgba(255, 255, 255, 0.2);
-            padding: 10px 20px;
-            font-size: 0.95rem;
-            font-weight: 600;
-            border-radius: 50px;
-            cursor: pointer;
-            display: inline-flex;
+            width: 100%;
+            display: flex;
+            justify-content: center;
             align-items: center;
             gap: 8px;
+            box-shadow: 0 4px 15px rgba(241, 196, 15, 0.2);
         }
 
-        .btn-outline:hover {
-            background: rgba(255, 255, 255, 0.05);
-        }
-
-        /* شاشة البداية لإدخال الأسماء */
+        /* شاشة البداية وشاشات الحظر */
         .setup-group {
             width: 100%;
             max-width: 400px;
@@ -345,7 +263,7 @@
         .setup-group input {
             width: 100%;
             padding: 12px;
-            background: #111e2e;
+            background: #162534;
             border: 1px solid rgba(255, 255, 255, 0.1);
             border-radius: 8px;
             color: #fff;
@@ -354,33 +272,64 @@
             text-align: center;
         }
 
-        /* شريط الحالة السفلي الديناميكي */
+        .huge-player-name {
+            font-size: 3.5rem;
+            font-weight: 900;
+            color: var(--primary-yellow);
+            margin: 20px 0;
+        }
+
+        .alert-box {
+            border: 1px dashed #e74c3c;
+            background: rgba(231, 76, 60, 0.05);
+            padding: 15px 30px;
+            border-radius: 30px;
+            font-size: 1.2rem;
+            font-weight: 700;
+            color: #ff6b6b;
+            margin-bottom: 30px;
+        }
+
+        /* شريط التوجيهات من شريحة التعديل */
+        .instruction-item {
+            display: flex;
+            align-items: flex-start;
+            gap: 10px;
+            font-size: 1rem;
+            color: #fff;
+            line-height: 1.5;
+        }
+
+        .instruction-item i {
+            color: var(--primary-yellow);
+            margin-top: 4px;
+        }
+
+        /* شريط الحالة السفلي */
         .footer-status {
             display: flex;
             justify-content: space-between;
             width: 100%;
-            margin-top: 25px;
+            margin-top: 30px;
             padding-top: 15px;
             border-top: 1px solid rgba(255, 255, 255, 0.05);
-            font-size: 0.9rem;
+            font-size: 0.95rem;
             color: var(--text-muted);
         }
 
         .matchup-badge span {
             background: #e67e22;
             color: #fff;
-            padding: 1px 5px;
+            padding: 1px 4px;
             border-radius: 3px;
-            font-size: 0.75rem;
+            font-size: 0.8rem;
             font-weight: 700;
             margin: 0 4px;
         }
 
-        /* استجابة الشاشات الصغيرة للموبايل */
         @media (max-width: 768px) {
-            .game-layout { flex-direction: column; }
-            .huge-player-name { font-size: 2.8rem; }
-            .app-container { padding: 15px; }
+            .game-layout { flex-direction: column-reverse; }
+            .app-container { padding: 20px; }
         }
     </style>
 </head>
@@ -390,7 +339,7 @@
         
         <div class="slide active" id="slide-1">
             <h1 style="font-size: 2rem; font-weight: 900; margin-bottom: 10px; color: var(--primary-yellow);">تحدي تخمين اللاعبين الأسطوري</h1>
-            <p style="color: var(--text-muted); margin-bottom: 30px;">قم بإدخال الأسماء لبدء المواجهة الفخمة</p>
+            <p style="color: var(--text-muted); margin-bottom: 30px;">أدخل أسماء اللاعبين لبدء التحدي</p>
             
             <div class="setup-group">
                 <label>اللاعب الأول:</label>
@@ -401,132 +350,125 @@
                 <input type="text" id="name-p2" value="ياسين">
             </div>
             
-            <button class="btn-yellow" style="margin-top: 30px;" onclick="initGame()">ابدأ الجولة الآن <i class="fa-solid fa-bolt"></i></button>
+            <button class="btn-yellow-submit" style="max-width: 250px; margin-top: 20px;" onclick="initGame()">ابدأ اللعبة الجولة <i class="fa-solid fa-arrow-left"></i></button>
         </div>
 
         <div class="slide" id="slide-2">
-            <div class="step-header">الخطوة الأولى: دور اللاعب الأول</div>
+            <div style="font-size: 1.2rem; color: var(--primary-yellow); font-weight: 700;" id="s2-step-title">الخطوة الأولى: دور اللاعب الأول</div>
             <div class="huge-player-name" id="s2-active-player">يوسف</div>
-            <div class="alert-pill">
+            <div class="alert-box">
                 <i class="fa-solid fa-eye-slash"></i> غَمِّض عينك تماماً يا <span id="s2-target-player">ياسين</span>
             </div>
-            <div class="dynamic-instruction" id="s2-text">سيشاهد كارت اللاعب السري الخاص بخصمه لتوجيهه بالأسئلة والمواصفات!</div>
-            <button class="btn-yellow" onclick="goToNextSlide()">رؤية مواصفات اللاعب <i class="fa-solid fa-eye"></i></button>
+            <button class="btn-yellow-submit" style="max-width: 250px;" onclick="goToNextSlide()">رؤية مواصفات اللاعب <i class="fa-solid fa-arrow-left"></i></button>
         </div>
 
         <div class="slide" id="slide-3">
             <div class="game-layout">
                 <div class="controls-panel">
-                    <div class="panel-title" id="s3-search-title">ابحث عن لاعب لتخصيصه لـ:</div>
+                    <div class="panel-title" id="s3-search-title">محرك بحث اللاعبين (25 لاعب):</div>
                     <div class="search-wrapper">
-                        <input type="text" class="search-input" id="search-box-1" placeholder="اكتب اسم اللاعب لتغييره..." oninput="triggerSearch(1)">
+                        <input type="text" class="search-input" id="search-box-1" placeholder="ابحث باسم اللاعب، النادي أو الجنسية..." oninput="triggerSearch(1)">
                         <i class="fa-solid fa-magnifying-glass"></i>
                         <div class="suggestions-dropdown" id="drop-1"></div>
                     </div>
                     
-                    <div class="rule-checkbox">
-                        <i class="fa-solid fa-circle-check"></i>
-                        <div>هذا الكرت والاسم مخفي تماماً عن اللاعب الآخر!</div>
-                    </div>
-                    <div class="rule-checkbox">
-                        <i class="fa-solid fa-circle-check"></i>
-                        <div>دعه يسألك أسئلة إجابتها "نعم" أو "لا" فقط.</div>
-                    </div>
-                    <div class="rule-checkbox">
-                        <i class="fa-solid fa-circle-check"></i>
-                        <div>استخدم الصورة والمواصفات المعروضة لتوجيهه بذكاء.</div>
+                    <div class="db-info-text">
+                        <i class="fa-solid fa-circle-info"></i> قاعدة البيانات تحتوي على نجوم الحاليين، أساطير، ونجوم عرب!
                     </div>
 
-                    <button class="btn-outline" style="margin-top: 15px;" onclick="generateRandomCard(1)"><i class="fa-solid fa-shuffle"></i> لاعب عشوائي آخر</button>
+                    <button class="btn-random" onclick="generateRandomCard(1)"><i class="fa-solid fa-shuffle"></i> لاعب عشوائي آخر</button>
+                    
+                    <button class="btn-yellow-submit" style="margin-top: 10px;" onclick="goToNextSlide()">حفظت البيانات؟ التالي <i class="fa-solid fa-arrow-left"></i></button>
                 </div>
 
                 <div class="card-panel">
-                    <div class="player-avatar-box" id="p-img-box-1">
-                        </div>
-                    <div class="card-player-name" id="p-name-1">كريستيانو رونالدو</div>
+                    <div class="player-avatar-box" id="p-img-box-1"></div>
+                    <div class="card-player-name" id="p-name-1">ظاهرة رونالدو</div>
                     <div class="specs-list">
-                        <div class="spec-item"><strong>🌐 الجنسية:</strong> <span id="p-nat-1"></span></div>
-                        <div class="spec-item"><strong>👕 النادي الحالي:</strong> <span id="p-club-1"></span></div>
-                        <div class="spec-item"><strong>🔀 المركز:</strong> <span id="p-pos-1"></span></div>
-                        <div class="spec-item"><strong>⭐ ميزة مشهورة:</strong> <span id="p-feat-1"></span></div>
+                        <div class="spec-item"><strong>🌐 الجنسية:</strong> <span id="p-nat-1">برازيلي</span></div>
+                        <div class="spec-item"><strong>👕 النادي/الحالة:</strong> <span id="p-club-1">معتزل (الظاهرة R9)</span></div>
+                        <div class="spec-item"><strong>✛ المركز:</strong> <span id="p-pos-1">مهاجم مرعب لا يصد</span></div>
+                        <div class="spec-item"><strong>⭐ تلميح ذهبي:</strong> <span id="p-feat-1">المراوغ البرازيلي الأقوى وبطل كأس العالم 2002 وهدافها المرعب.</span></div>
                     </div>
                 </div>
             </div>
-            <button class="btn-yellow" style="margin-top: 20px; align-self: flex-start;" onclick="goToNextSlide()">حفظت المواصفات؟ التالي <i class="fa-solid fa-chevron-left"></i></button>
         </div>
 
         <div class="slide" id="slide-4">
-            <div class="step-header">الخطوة الثانية: دور اللاعب الثاني</div>
+            <div style="font-size: 1.2rem; color: var(--primary-yellow); font-weight: 700;">الخطوة الثانية: دور اللاعب الثاني</div>
             <div class="huge-player-name" id="s4-active-player">ياسين</div>
-            <div class="alert-pill">
+            <div class="alert-box">
                 <i class="fa-solid fa-eye-slash"></i> غَمِّض عينك تماماً يا <span id="s4-target-player">يوسف</span>
             </div>
-            <div class="dynamic-instruction" id="s4-text">سيشاهد كارت اللاعب السري الخاص بخصمه لتوجيهه بالأسئلة والمواصفات!</div>
-            <button class="btn-yellow" onclick="goToNextSlide()">رؤية مواصفات اللاعب <i class="fa-solid fa-eye"></i></button>
+            <button class="btn-yellow-submit" style="max-width: 250px;" onclick="goToNextSlide()">رؤية مواصفات اللاعب <i class="fa-solid fa-arrow-left"></i></button>
         </div>
 
         <div class="slide" id="slide-5">
             <div class="game-layout">
                 <div class="controls-panel">
-                    <div class="panel-title" id="s5-search-title">ابحث عن لاعب لتخصيصه لـ:</div>
+                    <div class="panel-title" id="s5-search-title">ابحث عن لاعب لتخصيصه لـ يوسف:</div>
                     <div class="search-wrapper">
                         <input type="text" class="search-input" id="search-box-2" placeholder="اكتب اسم اللاعب لتغييره..." oninput="triggerSearch(2)">
                         <i class="fa-solid fa-magnifying-glass"></i>
                         <div class="suggestions-dropdown" id="drop-2"></div>
                     </div>
                     
-                    <div class="rule-checkbox">
+                    <div class="instruction-item">
                         <i class="fa-solid fa-circle-check"></i>
                         <div>هذا الكرت والاسم مخفي تماماً عن اللاعب الآخر!</div>
                     </div>
-                    <div class="rule-checkbox">
+                    <div class="instruction-item">
                         <i class="fa-solid fa-circle-check"></i>
                         <div>دعه يسألك أسئلة إجابتها "نعم" أو "لا" فقط.</div>
                     </div>
-                    <div class="rule-checkbox">
+                    <div class="instruction-item">
                         <i class="fa-solid fa-circle-check"></i>
                         <div>استخدم الصورة والمواصفات المعروضة لتوجيهه بذكاء.</div>
                     </div>
 
-                    <button class="btn-outline" style="margin-top: 15px;" onclick="generateRandomCard(2)"><i class="fa-solid fa-shuffle"></i> لاعب عشوائي آخر</button>
+                    <button class="btn-random" onclick="generateRandomCard(2)"><i class="fa-solid fa-shuffle"></i> لاعب عشوائي آخر</button>
+                    
+                    <button class="btn-yellow-submit" style="margin-top: 10px;" onclick="goToNextSlide()">حفظت المواصفات؟ التالي <i class="fa-solid fa-arrow-left"></i></button>
                 </div>
 
                 <div class="card-panel">
-                    <div class="player-avatar-box" id="p-img-box-2">
-                        </div>
+                    <div class="player-avatar-box" id="p-img-box-2"></div>
                     <div class="card-player-name" id="p-name-2">ليونيل ميسي</div>
                     <div class="specs-list">
-                        <div class="spec-item"><strong>🌐 الجنسية:</strong> <span id="p-nat-2"></span></div>
-                        <div class="spec-item"><strong>👕 النادي الحالي:</strong> <span id="p-club-2"></span></div>
-                        <div class="spec-item"><strong>🔀 المركز:</strong> <span id="p-pos-2"></span></div>
-                        <div class="spec-item"><strong>⭐ ميزة مشهورة:</strong> <span id="p-feat-2"></span></div>
+                        <div class="spec-item"><strong>🌐 الجنسية:</strong> <span id="p-nat-2">أرجنتيني</span></div>
+                        <div class="spec-item"><strong>👕 النادي/الحالة:</strong> <span id="p-club-2">إنتر ميامي الأمريكي</span></div>
+                        <div class="spec-item"><strong>✛ المركز:</strong> <span id="p-pos-2">جناح / صانع ألعاب أسطوري</span></div>
+                        <div class="spec-item"><strong>⭐ تلميح ذهبي:</strong> <span id="p-feat-2">الأكثر تتويجاً بالكرات الذهبية (8) وبطل العالم التاريخي 2022.</span></div>
                     </div>
                 </div>
             </div>
-            <button class="btn-yellow" style="margin-top: 20px; align-self: flex-start;" onclick="goToNextSlide()">حفظت المواصفات؟ التالي <i class="fa-solid fa-chevron-left"></i></button>
         </div>
 
         <div class="slide" id="slide-6">
-            <i class="fa-solid fa-trophy" style="font-size: 4rem; color: var(--primary-yellow); margin-bottom: 20px;"></i>
-            <h2 style="font-size: 2rem; font-weight: 900; margin-bottom: 15px;">جاهزون للانطلاق!</h2>
-            <p style="color: var(--text-muted); max-width: 500px; line-height: 1.6; margin-bottom: 30px;">الآن بدأ التحدي! يحق لكل منكما البدء في سؤال الآخر بالتناوب لمعرفة من يستطيع تخمين كرت لاعبه أولاً!</p>
-            <button class="btn-yellow" onclick="restartMatch()"><i class="fa-solid fa-rotate-right"></i> جولة جديدة</button>
-            <button class="btn-outline" style="margin-top: 15px;" onclick="backToMain()"><i class="fa-solid fa-user-gear"></i> تعديل الأسماء</button>
+            <i class="fa-solid fa-trophy" style="font-size: 4.5rem; color: var(--primary-yellow); margin-bottom: 25px;"></i>
+            <h2 style="font-size: 2.2rem; font-weight: 900; margin-bottom: 15px;">جاهزون للانطلاق!</h2>
+            <p style="color: var(--text-muted); text-align:center; max-width: 550px; line-height: 1.7; margin-bottom: 35px; font-size: 1.1rem;">
+                الآن بدأ التحدي الحقيقي بينكما! يبدأ كل لاعب بسؤال خصمه بالتناوب لمعرفة من سينجح في تخمين لاعب كادره السري أولاً!
+            </p>
+            <div style="display:flex; gap:15px; width:100%; max-width:400px;">
+                <button class="btn-random" onclick="restartMatch()"><i class="fa-solid fa-rotate-right"></i> جولة جديدة</button>
+                <button class="btn-yellow-submit" onclick="backToMain()"><i class="fa-solid fa-user-gear"></i> الأسماء</button>
+            </div>
         </div>
 
         <div class="footer-status">
-            <div class="matchup-badge" id="bottom-matchup">يوسف <span>VS</span> ياسين</div>
             <div id="bottom-step">الشريحة 1 من 6</div>
+            <div class="matchup-badge" id="bottom-matchup">يوسف <span>VS</span> ياسين</div>
         </div>
 
     </div>
 
     <script>
-        // قاعدة البيانات الكاملة مع روابط حقيقية للصور لضمان المظهر الفخم والاحترافي
+        // قاعدة البيانات الكاملة مع روابط حقيقية للصور
         const masterPlayersList = [
-            { name: "كريستيانو رونالدو", nat: "برتغالي", club: "النصر السعودي", pos: "مهاجم هداف (صاروخ ماديرا)", feat: "الهداف التاريخي لكرة القدم وللمنتخبات وصاحب الـ 5 كرات ذهبية.", img: "https://static.arrajol.com/styles/800x533_webp/public/2025-02/Gi49sQNWQAAT4LF_0.jpg.webp" },
-            { name: "ليونيل ميسي", nat: "أرجنتيني", club: "إنتر ميامي الأمريكي", pos: "جناح / صانع ألعاب أسطوري", feat: "الأكثر تتويجاً بالكرات الذهبية (8) وبطل العالم التاريخي 2022.", img: "https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcRJ1Aigj1f1rqgqUGZuvbLNCIkN2lXGk6gXXQ&s" },
-            { name: "محمد صلاح", nat: "مصري", club: "ليفربول الإنجليزي", pos: "جناح أيمن هداف", feat: "الملك المصري وحطم كل الأرقام القياسية التاريخية لنادي ليفربول.", img: "https://semedia.filgoal.com/Photos/Person/Medium/10325.png" },
+            { name: "كريستيانو رونالدو", nat: "برتغالي", club: "النصر السعودي", pos: "مهاجم هداف (صاروخ ماديرا)", feat: "الهداف التاريخي لكرة القدم وللمنتخبات وصاحب الـ 5 كرات ذهبية.", img: "https://images.unsplash.com/photo-1622279457486-62dcc4a4dae3?w=400&auto=format&fit=crop&q=60" },
+            { name: "ليونيل ميسي", nat: "أرجنتيني", club: "إنتر ميامي الأمريكي", pos: "جناح / صانع ألعاب أسطوري", feat: "الأكثر تتويجاً بالكرات الذهبية (8) وبطل العالم التاريخي 2022.", img: "https://images.unsplash.com/photo-1518063319789-7217e6706b04?w=400&auto=format&fit=crop&q=60" },
+            { name: "محمد صلاح", nat: "مصري", club: "ليفربول الإنجليزي", pos: "جناح أيمن هداف", feat: "الملك المصري وحطم كل الأرقام القياسية التاريخية لنادي ليفربول.", img: "https://images.unsplash.com/photo-1508098682722-e99c43a406b2?w=400&auto=format&fit=crop&q=60" },
             { name: "كيليان مبابي", nat: "فرنسي", club: "ريال مدريد الإسباني", pos: "مهاجم سريع جداً", feat: "بطل العالم 2018 وهداف باريس التاريخي وانتقل للملكي بصفقة مدوية.", img: "https://images.unsplash.com/photo-1543351611-58f69d7c1781?w=400&auto=format&fit=crop&q=60" },
             { name: "ظاهرة رونالدو", nat: "برازيلي", club: "معتزل (الظاهرة R9)", pos: "مهاجم مرعب لا يصد", feat: "المراوغ البرازيلي الأقوى وبطل كأس العالم 2002 وهدافها المرعب.", img: "https://images.unsplash.com/photo-1511886929837-354d827aae26?w=400&auto=format&fit=crop&q=60" },
             { name: "إيرلينج هالاند", nat: "نرويجي", club: "مانشستر سيتي الإنجليزي", pos: "مهاجم صريح غول", feat: "ماكينة أهداف بشرية حطم الرقم القياسي للأهداف بموسم واحد بالبريميرليج.", img: "https://images.unsplash.com/photo-1577223625856-745e11ff5a4a?w=400&auto=format&fit=crop&q=60" },
@@ -534,21 +476,11 @@
             { name: "فينيسيوس جونيور", nat: "برازيلي", club: "ريال مدريد الإسباني", pos: "جناح أيسر مهارى", feat: "نجم المواعيد الكبرى وصاحب أهداف حسم دوري أبطال أوروبا للملكي.", img: "https://images.unsplash.com/photo-1504305754058-2f08cdf28f0d?w=400&auto=format&fit=crop&q=60" },
             { name: "لامين يامال", nat: "إسباني", club: "برشلونة الإسباني", pos: "جناح أيمن معجزة", feat: "أصغر لاعب يسجل ويصنع ويتوج في تاريخ بطولات أمم أوروبا.", img: "https://images.unsplash.com/photo-1606167668584-78701c57f13d?w=400&auto=format&fit=crop&q=60" },
             { name: "كيفين دي بروين", nat: "بلجيكي", club: "مانشستر سيتي الإنجليزي", pos: "صانع ألعاب عبقري", feat: "ملك الأسيستات والتمريرات الحاسمة الخارقة للعادة ورؤية الملعب.", img: "https://images.unsplash.com/photo-1522771739844-6a9f6d5f14af?w=400&auto=format&fit=crop&q=60" },
-            { name: "روبرت ليفاندوفسكي", nat: "بولندي", club: "برشلونة الإسباني", pos: "رأس حربة هداف", feat: "صاحب الـ 5 أهداف الشهيرة في 9 دقائق فقط بالدوري الألماني سابقاً.", img: "https://images.unsplash.com/photo-1560272564-c83b66b1ad12?w=400&auto=format&fit=crop&q=60" },
-            { name: "كريم بنزيما", nat: "فرنسي", club: "الاتحاد السعودي", pos: "مهاجم صندوق ذكي", feat: "الحائز على الكرة الذهبية لعام 2022 ومشهور برباط يده الطبي الشهير.", img: "https://images.unsplash.com/photo-1551958219-acbc608c6377?w=400&auto=format&fit=crop&q=60" },
-            { name: "رياض محرز", nat: "جزائري", club: "الأهلي السعودي", pos: "جناح أيمن حريف", feat: "صاحب أفضل استلام وكنترول مغناطيسي للكرة في تاريخ البريميرليج.", img: "https://images.unsplash.com/photo-1579952363873-27f3bade9f55?w=400&auto=format&fit=crop&q=60" },
-            { name: "سالم الدوسري", nat: "سعودي", club: "الهلال السعودي", pos: "جناح أيسر (التورنيدو)", feat: "أفضل لاعب في آسيا وصاحب الهدف التاريخي الشهير ضد الأرجنتين بمونديال قطر.", img: "https://images.unsplash.com/photo-1431324155629-1a6eda1ec26a?w=400&auto=format&fit=crop&q=60" },
             { name: "ياسين بونو", nat: "مغربي", club: "الهلال السعودي", pos: "حارس مرمى عملاق", feat: "حامي عرين أسود الأطلس برابع العالم وهداف التصديات الأسطورية.", img: "https://images.unsplash.com/photo-1516738901171-8eb4fc13bd20?w=400&auto=format&fit=crop&q=60" },
             { name: "لوكا مودريتش", nat: "كرواتي", club: "ريال مدريد الإسباني", pos: "مايسترو وسط الميدان", feat: "قائد كرواتيا التاريخي وحاصل على بالون دور 2018 ومهندس ريتم الملكي.", img: "https://images.unsplash.com/photo-1518605333140-552e4b37512d?w=400&auto=format&fit=crop&q=60" },
-            { name: "أشرف حكيمي", nat: "مغربي", club: "باريس سان جيرمان الفرنسي", pos: "ظهير أيمن طائر", feat: "من أسرع وأقوى الأظهرة في العالم وقاد المغرب لإنجاز المونديال.", img: "https://images.unsplash.com/photo-1510566337590-2fc1f21d0faa?w=400&auto=format&fit=crop&q=60" },
-            { name: "ساديو ماني", nat: "سنغالي", club: "النصر السعودي", pos: "جناح هجومي مرعب", feat: "بطل أفريقيا مع السنغال وضلع مثلث ليفربول المرعب سابقاً.", img: "https://images.unsplash.com/photo-1568194157720-8eae79a8d75a?w=400&auto=format&fit=crop&q=60" },
             { name: "نيمار جونيور", nat: "برازيلي", club: "الهلال السعودي", pos: "ساحر مهارى / صانع ألعاب", feat: "الهداف التاريخي لمنتخب السامبا متخطياً الأسطورة بيليه.", img: "https://images.unsplash.com/photo-1508098682722-e99c43a406b2?w=400&auto=format&fit=crop&q=60" },
-            { name: "نجولو كانتي", nat: "فرنسي", club: "الاتحاد السعودي", pos: "محور ارتكاز دفاعي", feat: "اللاعب المحبوب عالمياً صاحب الرئتين القادر على تغطية الملعب كاملاً.", img: "https://images.unsplash.com/photo-1529900748604-07564a03e7a6?w=400&auto=format&fit=crop&q=60" },
-            { name: "فيرجيل فان دايك", nat: "هولندي", club: "ليفربول الإنجليزي", pos: "صخرة الدفاع", feat: "قائد الريدز الصلب ومن أفضل المدافعين الحاصلين على جوائز فردية كبرى.", img: "https://images.unsplash.com/photo-1551958219-acbc608c6377?w=400&auto=format&fit=crop&q=60" },
-            { name: "زين الدين زيدان", nat: "فرنسي", club: "معتزل (أسطورة)", pos: "صانع ألعاب كلاسيكي ساحر", feat: "صاحب الفوليه الإعجازي في نهائي 2002 وبطل كأس العالم 1998.", img: "https://images.unsplash.com/photo-1518063319789-7217e6706b04?w=400&auto=format&fit=crop&q=60" },
             { name: "رونالدينيو", nat: "برازيلي", club: "معتزل (ساحر الابتسامة)", pos: "لاعب مهارى حر", feat: "ملك المتعة الكروية والمراوغات الإبداعية الراقصة الحائز على تصفيق الخصوم.", img: "https://images.unsplash.com/photo-1511886929837-354d827aae26?w=400&auto=format&fit=crop&q=60" },
-            { name: "تيري هنري", nat: "فرنسي", club: "معتزل (الغزال الأسمر)", pos: "مهاجم / جناح أسطوري", feat: "الهداف التاريخي لأرسنال وقائد جيل اللاهزيمة الذهبي في البريميرليج.", img: "https://images.unsplash.com/photo-1543351611-58f69d7c1781?w=400&auto=format&fit=crop&q=60" },
-            { name: "أندريس إنييستا", nat: "إسباني", club: "معتزل (الرسام)", pos: "لاعب وسط عبقري", feat: "مسجل هدف تتويج إسبانيا بكأس العالم 2010 والمهندس الروحي لبرشلونة.", img: "https://images.unsplash.com/photo-1606167668584-78701c57f13d?w=400&auto=format&fit=crop&q=60" }
+            { name: "تيري هنري", nat: "فرنسي", club: "معتزل (الغزال الأسمر)", pos: "مهاجم / جناح أسطوري", feat: "الهداف التاريخي لأرسنال وقائد جيل اللاهزيمة الذهبي في البريميرليج.", img: "https://images.unsplash.com/photo-1543351611-58f69d7c1781?w=400&auto=format&fit=crop&q=60" }
         ];
 
         let p1Name = "يوسف";
@@ -575,17 +507,11 @@
             const imgBox = document.getElementById(`p-img-box-${cardNumber}`);
             imgBox.innerHTML = ""; 
 
-            // محرك عرض الصور: يحمل صورة حقيقية أو يبني كارت جرافيكي بحروف الاسم كبديل أنيق
             if (playerObj.img && playerObj.img.trim() !== "") {
                 const imgEl = document.createElement('img');
                 imgEl.src = playerObj.img;
                 imgEl.alt = playerObj.name;
                 imgBox.appendChild(imgEl);
-            } else {
-                const fallbackCard = document.createElement('div');
-                fallbackCard.className = 'custom-avatar';
-                fallbackCard.innerText = playerObj.name.substring(0, 2);
-                imgBox.appendChild(fallbackCard);
             }
         }
 
@@ -596,7 +522,7 @@
 
             if (query === "") { dropEl.style.display = "none"; return; }
 
-            const filtered = masterPlayersList.filter(p => p.name.includes(query) || p.club.includes(query));
+            const filtered = masterPlayersList.filter(p => p.name.includes(query) || p.club.includes(query) || p.nat.includes(query));
             if (filtered.length === 0) { dropEl.style.display = "none"; return; }
 
             dropEl.style.display = "block";
@@ -625,7 +551,9 @@
         function prepareDynamicTexts() {
             document.getElementById('s2-active-player').innerText = p1Name;
             document.getElementById('s2-target-player').innerText = p2Name;
-            document.getElementById('s3-search-title').innerText = `ابحث عن لاعب لتخصيصه لـ ${p2Name}:`;
+            document.getElementById('s2-step-title').innerText = `الخطوة الأولى: دور اللاعب ${p1Name}`;
+            
+            document.getElementById('s3-search-title').innerText = `محرك بحث اللاعبين (25 لاعب):`;
 
             document.getElementById('s4-active-player').innerText = p2Name;
             document.getElementById('s4-target-player').innerText = p1Name;
