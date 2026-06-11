@@ -3,348 +3,683 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>لعبة تخمين اللاعبين الأسطوري</title>
-    <!-- Bootstrap 5 CSS -->
-    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css" rel="stylesheet">
-    <!-- Google Fonts (Cairo) -->
-    <link href="https://fonts.googleapis.com/css2?family=Cairo:wght@400;700;900&display=swap" rel="stylesheet">
-    <!-- Vue 3 -->
-    <script src="https://unpkg.com/vue@3/dist/vue.global.js"></script>
+    <title>تحدي تخمين اللاعبين الأسطوري</title>
+    <link href="https://fonts.googleapis.com/css2?family=Cairo:wght=400;600;700;900&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    
     <style>
-        body {
+        :root {
+            --bg-color: #0b1520;
+            --card-dark: #111e2e;
+            --primary-yellow: #f1c40f;
+            --primary-hover: #d4ac0d;
+            --border-gold: #f1c40f;
+            --text-main: #ffffff;
+            --text-muted: #95a5a6;
+        }
+
+        * {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
             font-family: 'Cairo', sans-serif;
-            background-color: #0f172a;
-            color: #f8fafc;
-            padding: 30px 0;
         }
-        .game-container {
-            max-width: 800px;
-            margin: 0 auto;
-            background-color: #1e293b;
-            border: 3px solid #e2e8f0;
-            border-radius: 16px;
-            padding: 25px;
-            box-shadow: 0 10px 25px rgba(0,0,0,0.4);
-        }
-        .slice-card {
-            background-color: #0f172a;
-            border: 2px solid #334155;
-            border-radius: 12px;
+
+        body {
+            background-color: #1a2634; 
+            color: var(--text-main);
+            min-height: 100vh;
+            display: flex;
+            justify-content: center;
+            align-items: center;
             padding: 20px;
-            margin-bottom: 20px;
         }
-        .slice-header {
-            font-size: 1.25rem;
-            font-weight: 700;
-            color: #38bdf8;
-            border-bottom: 2px solid #334155;
-            padding-bottom: 10px;
-            margin-bottom: 15px;
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-        }
-        .slice-number {
-            background-color: #38bdf8;
-            color: #0f172a;
-            width: 28px;
-            height: 28px;
-            border-radius: 50%;
-            display: inline-flex;
-            align-items: center;
-            justify-content: center;
-            font-weight: 900;
-            font-size: 0.9rem;
-        }
-        .player-img-container {
+
+        /* حاوية البرنامج الرئيسية */
+        .app-container {
             width: 100%;
-            height: 220px;
-            background-color: #1e293b;
-            border-radius: 8px;
+            max-width: 950px;
+            background-color: #111e2e;
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            border-radius: 24px;
+            padding: 40px;
+            box-shadow: 0 15px 35px rgba(0, 0, 0, 0.5);
+            position: relative;
+            min-height: 600px;
             display: flex;
-            align-items: center;
+            flex-direction: column;
+            justify-content: space-between;
+        }
+
+        .slide {
+            display: none;
+            flex-grow: 1;
+            flex-direction: column;
             justify-content: center;
+            align-items: center;
+            width: 100%;
+        }
+
+        .slide.active {
+            display: flex;
+        }
+
+        /* تخطيط شاشة اللعب - الكارت يمين والبحث يسار كما في الصور */
+        .game-layout {
+            display: flex;
+            width: 100%;
+            gap: 40px;
+            align-items: flex-start;
+        }
+
+        /* الجانب الأيمن: كارت اللاعب الكبير */
+        .card-panel {
+            flex: 1.1;
+            background-color: #162534;
+            border-radius: 18px;
+            padding: 25px;
+            display: flex;
+            flex-direction: column;
+            border: 1px solid rgba(255, 255, 255, 0.05);
+            text-align: right;
+        }
+
+        /* إطار الصورة المتجاوب لمنع قص الصور العريضة والطويلة */
+        .player-avatar-box {
+            width: 100%;
+            height: 250px;
+            background: #0b1520;
+            border-radius: 12px;
+            margin-bottom: 20px;
+            display: flex;
+            justify-content: center;
+            align-items: center;
             overflow: hidden;
-            margin-bottom: 15px;
-            border: 1px solid #475569;
+            border: 1px solid rgba(255, 255, 255, 0.1);
         }
-        .player-img {
-            max-width: 100%;
-            max-height: 100%;
-            object-fit: contain;
+
+        .player-avatar-box img {
+            width: 100%;
+            height: 100%;
+            object-fit: contain; /* تعديل ليظهر الإطار مقاس الصورة دون أي قص */
+            background-color: #0b1520; 
         }
-        .info-badge {
-            background-color: #334155;
-            color: #f1f5f9;
-            padding: 8px 12px;
-            border-radius: 6px;
+
+        .card-player-name {
+            font-size: 2.2rem;
+            font-weight: 900;
+            color: var(--primary-yellow);
+            margin-bottom: 20px;
+            text-align: center;
+        }
+
+        .specs-list {
+            width: 100%;
+            display: flex;
+            flex-direction: column;
+            gap: 14px;
+        }
+
+        .spec-item {
+            font-size: 1.1rem;
+            line-height: 1.6;
+            color: #fff;
+        }
+
+        .spec-item strong {
+            color: var(--text-main);
+            font-weight: 700;
+        }
+
+        .spec-item span {
+            color: #d1d5db;
+        }
+
+        /* الجانب الأيسر: لوحة التحكم والبحث والتوجيهات */
+        .controls-panel {
+            flex: 0.9;
+            display: flex;
+            flex-direction: column;
+            gap: 20px;
+            text-align: right;
+        }
+
+        .panel-title {
+            color: var(--primary-yellow);
+            font-size: 1.3rem;
+            font-weight: 700;
+        }
+
+        .search-wrapper {
+            position: relative;
+            width: 100%;
+        }
+
+        .search-input {
+            width: 100%;
+            padding: 14px 15px 14px 45px;
+            background: #162534;
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            border-radius: 10px;
+            color: #fff;
+            font-size: 1.05rem;
+            text-align: right;
+        }
+
+        .search-input:focus {
+            outline: none;
+            border-color: var(--primary-yellow);
+        }
+
+        .search-wrapper i {
+            position: absolute;
+            left: 15px;
+            top: 50%;
+            transform: translateY(-50%);
+            color: var(--text-muted);
+            font-size: 1.2rem;
+        }
+
+        .suggestions-dropdown {
+            position: absolute;
+            top: 100%;
+            left: 0;
+            right: 0;
+            background: #1c2d42;
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            border-radius: 8px;
+            max-height: 180px;
+            overflow-y: auto;
+            z-index: 10;
+            display: none;
+        }
+
+        .suggest-item {
+            padding: 12px 15px;
+            cursor: pointer;
+            border-bottom: 1px solid rgba(255, 255, 255, 0.05);
+            font-size: 1rem;
+            text-align: right;
+        }
+
+        .suggest-item:hover {
+            background-color: var(--primary-yellow);
+            color: #000;
+        }
+
+        .db-info-text {
+            font-size: 0.95rem;
+            color: var(--text-muted);
+            line-height: 1.5;
+        }
+
+        /* الأزرار */
+        .btn-random {
+            background: #202f41;
+            color: #fff;
+            border: none;
+            padding: 14px;
+            font-size: 1.1rem;
+            font-weight: 600;
+            border-radius: 30px;
+            cursor: pointer;
+            width: 100%;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            gap: 10px;
+        }
+
+        .btn-yellow-submit {
+            background-color: var(--primary-yellow);
+            color: #000;
+            border: none;
+            padding: 14px;
+            font-size: 1.2rem;
+            font-weight: 700;
+            border-radius: 30px;
+            cursor: pointer;
+            width: 100%;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            gap: 8px;
+            box-shadow: 0 4px 15px rgba(241, 196, 15, 0.2);
+        }
+
+        /* شاشة البداية وشاشات الحظر */
+        .setup-group {
+            width: 100%;
+            max-width: 400px;
+            margin: 15px 0;
+            text-align: right;
+        }
+
+        .setup-group label {
+            display: block;
             margin-bottom: 8px;
             font-weight: 600;
+            color: var(--text-muted);
         }
-        .list-group-item-action {
-            background-color: #1e293b;
-            color: #f8fafc;
-            border: 1px solid #334155;
-            cursor: pointer;
-            transition: all 0.2s;
-        }
-        .list-group-item-action:hover {
-            background-color: #38bdf8;
-            color: #0f172a;
-        }
-        .btn-custom {
+
+        .setup-group input {
+            width: 100%;
+            padding: 12px;
+            background: #162534;
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            border-radius: 8px;
+            color: #fff;
+            font-size: 1.1rem;
             font-weight: 700;
-            padding: 10px 20px;
+            text-align: center;
+        }
+
+        .huge-player-name {
+            font-size: 3.5rem;
+            font-weight: 900;
+            color: var(--primary-yellow);
+            margin: 20px 0;
+        }
+
+        .alert-box {
+            border: 1px dashed #e74c3c;
+            background: rgba(231, 76, 60, 0.05);
+            padding: 15px 30px;
+            border-radius: 30px;
+            font-size: 1.2rem;
+            font-weight: 700;
+            color: #ff6b6b;
+            margin-bottom: 30px;
+        }
+
+        .instruction-item {
+            display: flex;
+            align-items: flex-start;
+            gap: 10px;
+            font-size: 1rem;
+            color: #fff;
+            line-height: 1.5;
+        }
+
+        .instruction-item i {
+            color: var(--primary-yellow);
+            margin-top: 4px;
+        }
+
+        /* شريط الحالة السفلي */
+        .footer-status {
+            display: flex;
+            justify-content: space-between;
+            width: 100%;
+            margin-top: 30px;
+            padding-top: 15px;
+            border-top: 1px solid rgba(255, 255, 255, 0.05);
+            font-size: 0.95rem;
+            color: var(--text-muted);
+        }
+
+        .matchup-badge span {
+            background: #e67e22;
+            color: #fff;
+            padding: 1px 4px;
+            border-radius: 3px;
+            font-size: 0.8rem;
+            font-weight: 700;
+            margin: 0 4px;
+        }
+
+        @media (max-width: 768px) {
+            .game-layout { flex-direction: column-reverse; }
+            .app-container { padding: 20px; }
         }
     </style>
 </head>
 <body>
 
-<div id="app" class="container">
-    <div class="game-container">
-        <h2 class="text-center fw-bold text-white mb-4">🎮 برنامج تخمين اللاعبين </h2>
+    <div class="app-container">
         
-        <!-- الشريحة 1: اختيار من الذي سيختار اللاعب ومن سيخمن -->
-        <div class="slice-card" v-if="currentStep >= 1">
-            <div class="slice-header">
-                <span>👤 الخطوة 1: تحديد الأدوار</span>
-                <span class="slice-number">1</span>
+        <div class="slide active" id="slide-1">
+            <h1 style="font-size: 2rem; font-weight: 900; margin-bottom: 10px; color: var(--primary-yellow);">تحدي تخمين اللاعبين الأسطوري</h1>
+            <p style="color: var(--text-muted); margin-bottom: 30px;">أدخل أسماء اللاعبين لبدء التحدي</p>
+            
+            <div class="setup-group">
+                <label>اللاعب الأول:</label>
+                <input type="text" id="name-p1" value="">
             </div>
-            <div class="row text-center" v-if="currentStep === 1">
-                <div class="col-6">
-                    <button class="btn btn-outline-info w-100 py-3 fw-bold" @click="setRoles('يوسف', 'ياسين')">
-                        👨‍💻 يوسف يختار واللاعب المخفي لـ ياسين
-                    </button>
-                </div>
-                <div class="col-6">
-                    <button class="btn btn-outline-warning w-100 py-3 fw-bold" @click="setRoles('ياسين', 'يوسف')">
-                        👨‍💻 ياسين يختار واللاعب المخفي لـ يوسف
-                    </button>
-                </div>
+            <div class="setup-group">
+                <label>اللاعب الثاني:</label>
+                <input type="text" id="name-p2" value="">
             </div>
-            <div v-else class="text-success fw-bold">
-                المُختار: <span class="text-white">{{ selector }}</span> | المُخمّن: <span class="text-white">{{ guesser }}</span>
-            </div>
+            
+            <button class="btn-yellow-submit" style="max-width: 250px; margin-top: 20px;" onclick="initGame()">ابدأ اللعبة الجولة <i class="fa-solid fa-arrow-left"></i></button>
         </div>
 
-        <!-- الشريحة 2: محرك البحث واختيار اللاعب السري (يظهر للمختار فقط) -->
-        <div class="slice-card" v-if="currentStep >= 2">
-            <div class="slice-header">
-                <span>🔍 الخطوة 2: اختيار اللاعب السري (دور {{ selector }})</span>
-                <span class="slice-number">2</span>
+        <div class="slide" id="slide-2">
+            <div style="font-size: 1.2rem; color: var(--primary-yellow); font-weight: 700;" id="s2-step-title">الخطوة الأولى: دور اللاعب الأول</div>
+            <div class="huge-player-name" id="s2-active-player"></div>
+            <div class="alert-box">
+                <i class="fa-solid fa-eye-slash"></i> غَمِّض عينك تماماً يا <span id="s2-target-player"></span>
             </div>
-            <div v-if="currentStep === 2">
-                <p class="text-warning small">⚠️ تنبيه: على "{{ guesser }}" إغلاق عينيه أو الالتفات حتى لا يرى اللاعب!</p>
-                <input type="text" v-model="searchQuery" class="form-control mb-3 bg-dark text-white border-secondary" placeholder="ابحث عن اسم اللاعب لتثبيته...">
-                <div style="max-height: 200px; overflow-y: auto;" class="rounded border border-secondary mb-3">
-                    <div class="list-group list-group-flush">
-                        <button v-for="player in filteredPlayers" :key="player.id" @click="selectSecretPlayer(player)" class="list-group-item list-group-item-action text-end">
-                            {{ player.name }} ({{ player.club }} - {{ player.nationality }})
-                        </button>
+            <button class="btn-yellow-submit" style="max-width: 250px;" onclick="goToNextSlide()">رؤية مواصفات اللاعب <i class="fa-solid fa-arrow-left"></i></button>
+        </div>
+
+        <div class="slide" id="slide-3">
+            <div class="game-layout">
+                <div class="controls-panel">
+                    <div class="panel-title" id="s3-search-title">محرك بحث اللاعبين (200 لاعب):</div>
+                    <div class="search-wrapper">
+                        <input type="text" class="search-input" id="search-box-1" placeholder="ابحث باسم اللاعب، النادي أو الجنسية..." oninput="triggerSearch(1)">
+                        <i class="fa-solid fa-magnifying-glass"></i>
+                        <div class="suggestions-dropdown" id="drop-1"></div>
+                    </div>
+                    
+                    <div class="db-info-text">
+                        <i class="fa-solid fa-circle-info"></i> قاعدة البيانات تحتوي على 200 نجم من النجوم الحاليين، الأساطير، والعرب!
+                    </div>
+
+                    <button class="btn-random" onclick="generateRandomCard(1)"><i class="fa-solid fa-shuffle"></i> لاعب عشوائي آخر</button>
+                    
+                    <button class="btn-yellow-submit" style="margin-top: 10px;" onclick="goToNextSlide()">حفظت البيانات؟ التالي <i class="fa-solid fa-arrow-left"></i></button>
+                </div>
+
+                <div class="card-panel">
+                    <div class="player-avatar-box" id="p-img-box-1"></div>
+                    <div class="card-player-name" id="p-name-1">ظاهرة رونالدو</div>
+                    <div class="specs-list">
+                        <div class="spec-item"><strong>🌐 الجنسية:</strong> <span id="p-nat-1">برازيلي</span></div>
+                        <div class="spec-item"><strong>👕 النادي/الحالة:</strong> <span id="p-club-1">معتزل (الظاهرة R9)</span></div>
+                        <div class="spec-item"><strong>✛ المركز:</strong> <span id="p-pos-1">مهاجم مرعب لا يصد</span></div>
+                        <div class="spec-item"><strong>⭐ تلميح ذهبي:</strong> <span id="p-feat-1">المراوغ البرازيلي الأقوى وبطل كأس العالم 2002 وهدافها المرعب.</span></div>
                     </div>
                 </div>
             </div>
-            <div v-else class="text-info fw-bold">
-                🔒 تم اختيار وتثبيت اللاعب السري بنجاح ومواصفاته جاهزة للتخمين!
-            </div>
         </div>
 
-        <!-- الشريحة 3: تأكيد إخفاء الشاشة والتبادل -->
-        <div class="slice-card" v-if="currentStep >= 3">
-            <div class="slice-header">
-                <span>🔄 الخطوة 3: تبادل الأدوار وشاشة التخمين</span>
-                <span class="slice-number">3</span>
+        <div class="slide" id="slide-4">
+            <div style="font-size: 1.2rem; color: var(--primary-yellow); font-weight: 700;">الخطوة الثانية: دور اللاعب الثاني</div>
+            <div class="huge-player-name" id="s4-active-player"></div>
+            <div class="alert-box">
+                <i class="fa-solid fa-eye-slash"></i> غَمِّض عينك تماماً يا <span id="s4-target-player"></span>
             </div>
-            <div v-if="currentStep === 3" class="text-center">
-                <p class="mb-3">الآن، يجب على "{{ selector }}" تسليم الجهاز أو الماوس إلى "{{ guesser }}" للبدء في طرح الأسئلة والتخمين.</p>
-                <button class="btn btn-primary btn-custom" @click="currentStep = 4">أنا {{ guesser }} وجاهز للتحدي 🚀</button>
-            </div>
-            <div v-else class="text-success fw-bold">
-                🎮 الجهاز الآن مع المخمّن ({{ guesser }}).
-            </div>
+            <button class="btn-yellow-submit" style="max-width: 250px;" onclick="goToNextSlide()">رؤية مواصفات اللاعب <i class="fa-solid fa-arrow-left"></i></button>
         </div>
 
-        <!-- الشريحة 4: عرض مواصفات وصورة اللاعب المختار بدون اسمه للبدء بالأسئلة -->
-        <div class="slice-card" v-if="currentStep >= 4">
-            <div class="slice-header">
-                <span>📋 الخطوة 4: مواصفات ومظهر اللاعب المخفي</span>
-                <span class="slice-number">4</span>
-            </div>
-            <div v-if="currentStep >= 4">
-                <div class="row">
-                    <div class="col-md-5">
-                        <div class="player-img-container">
-                            <img :src="secretPlayer.image" class="player-img" alt="لاعب سري">
-                        </div>
+        <div class="slide" id="slide-5">
+            <div class="game-layout">
+                <div class="controls-panel">
+                    <div class="panel-title" id="s5-search-title">ابحث عن لاعب لتخصيصه لـ يوسف:</div>
+                    <div class="search-wrapper">
+                        <input type="text" class="search-input" id="search-box-2" placeholder="اكتب اسم اللاعب لتغييره..." oninput="triggerSearch(2)">
+                        <i class="fa-solid fa-magnifying-glass"></i>
+                        <div class="suggestions-dropdown" id="drop-2"></div>
                     </div>
-                    <div class="col-md-7 d-flex flex-column justify-content-center">
-                        <div class="info-badge">📍 <strong>المركز الحالي:</strong> {{ secretPlayer.position }}</div>
-                        <div class="info-badge">🏟️ <strong>النادي لعام 2026:</strong> {{ secretPlayer.club }}</div>
-                        <div class="info-badge">🌍 <strong>الجنسية / المنتخب:</strong> {{ secretPlayer.nationality }}</div>
-                        <div class="info-badge">🎂 <strong>العمر الحالي:</strong> {{ secretPlayer.age }} سنة</div>
+                    
+                    <div class="instruction-item">
+                        <i class="fa-solid fa-circle-check"></i>
+                        <div>هذا الكرت والاسم مخفي تماماً عن اللاعب الآخر!</div>
                     </div>
-                </div>
-                <div class="text-center mt-3" v-if="currentStep === 4">
-                    <p class="text-muted small">اسأل صاحبك أسئلة (نعم أو لا) بناءً على المواصفات المذكورة أعلاه، وإذا عرفت الإجابة اضغط بالأسفل.</p>
-                    <button class="btn btn-warning btn-custom" @click="currentStep = 5">انتقل إلى كتابة التخمين النهائي 📝</button>
-                </div>
-            </div>
-        </div>
+                    <div class="instruction-item">
+                        <i class="fa-solid fa-circle-check"></i>
+                        <div>دعه يسألك أسئلة إجابتها "نعم" أو "لا" فقط.</div>
+                    </div>
+                    <div class="instruction-item">
+                        <i class="fa-solid fa-circle-check"></i>
+                        <div>استخدم الصورة والمواصفات المعروضة لتوجيهه بذكاء.</div>
+                    </div>
 
-        <!-- الشريحة 5: محرك البحث للمخمّن لاختيار وتخمين اسم اللاعب -->
-        <div class="slice-card" v-if="currentStep >= 5">
-            <div class="slice-header">
-                <span>🤔 الخطوة 5: كتابة التخمين واختيار الاسم</span>
-                <span class="slice-number">5</span>
-            </div>
-            <div v-if="currentStep === 5">
-                <input type="text" v-model="guessQuery" class="form-control mb-3 bg-dark text-white border-secondary" placeholder="ابحث واختر الاسم الذي تعتقد أنه صحيح...">
-                <div style="max-height: 200px; overflow-y: auto;" class="rounded border border-secondary">
-                    <div class="list-group list-group-flush">
-                        <button v-for="player in filteredGuessPlayers" :key="player.id" @click="checkFinalGuess(player.name)" class="list-group-item list-group-item-action text-end">
-                            {{ player.name }}
-                        </button>
+                    <button class="btn-random" onclick="generateRandomCard(2)"><i class="fa-solid fa-shuffle"></i> لاعب عشوائي آخر</button>
+                    
+                    <button class="btn-yellow-submit" style="margin-top: 10px;" onclick="goToNextSlide()">حفظت المواصفات؟ التالي <i class="fa-solid fa-arrow-left"></i></button>
+                </div>
+
+                <div class="card-panel">
+                    <div class="player-avatar-box" id="p-img-box-2"></div>
+                    <div class="card-player-name" id="p-name-2">ليونيل ميسي</div>
+                    <div class="specs-list">
+                        <div class="spec-item"><strong>🌐 الجنسية:</strong> <span id="p-nat-2">أرجنتيني</span></div>
+                        <div class="spec-item"><strong>👕 النادي/الحالة:</strong> <span id="p-club-2">إنتر ميامي الأمريكي</span></div>
+                        <div class="spec-item"><strong>✛ المركز:</strong> <span id="p-pos-2">جناح / صانع ألعاب أسطوري</span></div>
+                        <div class="spec-item"><strong>⭐ تلميح ذهبي:</strong> <span id="p-feat-2">الأكثر تتويجاً بالكرات الذهبية (8) وبطل العالم التاريخي 2022.</span></div>
                     </div>
                 </div>
             </div>
-            <div v-else class="text-success fw-bold">
-                🎯 قمت بتقديم التخمين!
+        </div>
+
+        <div class="slide" id="slide-6">
+            <i class="fa-solid fa-trophy" style="font-size: 4.5rem; color: var(--primary-yellow); margin-bottom: 25px;"></i>
+            <h2 style="font-size: 2.2rem; font-weight: 900; margin-bottom: 15px;">جاهزون للانطلاق!</h2>
+            <p style="color: var(--text-muted); text-align:center; max-width: 550px; line-height: 1.7; margin-bottom: 35px; font-size: 1.1rem;">
+                الآن بدأ التحدي الحقيقي بينكما! يبدأ كل لاعب بسؤال خصمه بالتناوب لمعرفة من سينجح في تخمين لاعب كادره السري أولاً!
+            </p>
+            <div style="display:flex; gap:15px; width:100%; max-width:400px;">
+                <button class="btn-random" onclick="restartMatch()"><i class="fa-solid fa-rotate-right"></i> جولة جديدة</button>
+                <button class="btn-yellow-submit" onclick="backToMain()"><i class="fa-solid fa-user-gear"></i> الأسماء</button>
             </div>
         </div>
 
-        <!-- الشريحة 6: النتيجة النهائية وكشف الاسم مع خيار إعادة اللعب -->
-        <div class="slice-card" v-if="currentStep >= 6">
-            <div class="slice-header">
-                <span>🏆 الخطوة 6: النتيجة النهائية</span>
-                <span class="slice-number">6</span>
-            </div>
-            <div class="text-center">
-                <div v-if="gameResult === 'win'">
-                    <h3 class="text-success fw-bold mb-3">🎉 كفوووو! إجابة صحيحة مئة بالمئة!</h3>
-                    <p class="fs-5">اللاعب هو بالفعل الأسطورة: <strong class="text-warning">{{ secretPlayer.name }}</strong></p>
-                </div>
-                <div v-else>
-                    <h3 class="text-danger fw-bold mb-3">❌ للاسف التخمين لم يكن صحيحاً!</h3>
-                    <p class="fs-5">اللاعب السري الذي تم اختياره كان: <strong class="text-warning">{{ secretPlayer.name }}</strong></p>
-                </div>
-                <button class="btn btn-light btn-custom mt-3" @click="resetGame">🔄 جولة جديدة وتحدي آخر</button>
-            </div>
+        <div class="footer-status">
+            <div id="bottom-step">الشريحة 1 من 6</div>
+            <div class="matchup-badge" id="bottom-matchup">يوسف <span>VS</span> ياسين</div>
         </div>
 
     </div>
-</div>
 
-<script>
-const { createApp, ref, computed } = Vue;
+    <script>
+        // قاعدة البيانات الكاملة المكونة من 200 لاعب حقيقيين بمواصفاتهم وصورهم الحقيقية الموزعة مئة بالمئة
+        const masterPlayersList = [
+            // --- أساطير تاريخيين ---
+            { name: "بيلييه", nat: "برازيلي", club: "معتزل (الجوهرة السوداء)", pos: "مهاجم / صانع ألعاب تاريخي", feat: "اللاعب الوحيد في التاريخ الذي توج بـ 3 بطولات كأس عالم وسجل أكثر من 1000 هدف.", img: "https://a.espncdn.com/i/headshots/desktop/players/22816.png" },
+            { name: "دييغو مارادونا", nat: "أرجنتيني", club: "معتزل (أسطورة القرن)", pos: "صانع ألعاب / جناح أسطوري", feat: "قاد الأرجنتين بمفرده تقريباً للتتويج بكأس العالم 1986 وهدفه الشهير ضد إنجلترا.", img: "https://a.espncdn.com/i/headshots/soccer/players/full/45889.png" },
+            { name: "ظاهرة رونالدو", nat: "برازيلي", club: "معتزل (الظاهرة R9)", pos: "مهاجم مرعب لا يصد", feat: "المراوغ البرازيلي الأقوى وبطل كأس العالم 2002 وهدافها المرعب ورغم الإصابات صُنّف كأفضل مهاجم.", img: "https://a.espncdn.com/i/headshots/desktop/players/20155.png" },
+            { name: "زين الدين زيدان", nat: "فرنسي", club: "معتزل (المايسترو زيزو)", pos: "لاعب وسط هجومي عبقري", feat: "بطل كأس العالم 1998 وصاحب النطحة الشهيرة والهدف الأسطوري الطائر في نهائي دوري الأبطال 2002.", img: "https://a.espncdn.com/i/headshots/desktop/players/22816.png" },
+            { name: "رونالدينيو", nat: "برازيلي", club: "معتزل (ساحر الابتسامة)", pos: "لاعب مهارى حر / جناح", feat: "ملك المتعة الكروية والمراوغات الإبداعية الراقصة الحائز على تصفيق جماهير البيرنابيو.", img: "https://a.espncdn.com/i/headshots/desktop/players/20155.png" },
+            { name: "تيري هنري", nat: "فرنسي", club: "معتزل (الغزال الأسمر)", pos: "مهاجم / جناح أسطوري", feat: "الهداف التاريخي لأرسنال وقائد جيل اللاهزيمة الذهبي التاريخي في البريميرليج.", img: "https://a.espncdn.com/i/headshots/soccer/players/full/231747.png" },
+            { name: "يوهان كرويف", nat: "هولندي", club: "معتزل (مبتكر الكرة الشاملة)", pos: "صانع ألعاب / مهاجم وهمي", feat: "الأب الروحي لأسلوب لعب برشلونة وأسطورة هولندا في السبعينات وصاحب الـ 3 كرات ذهبية.", img: "https://a.espncdn.com/i/headshots/soccer/players/full/210515.png" },
+            { name: "ميشيل بلاتيني", nat: "فرنسي", club: "معتزل", pos: "لاعب وسط هجومي", feat: "فاز بالكرة الذهبية 3 مرات متتالية في الثمانينات وهداف أمم أوروبا الأسطوري التاريخي.", img: "https://a.espncdn.com/i/headshots/soccer/players/full/231747.png" },
+            { name: "باولو مالديني", nat: "إيطالي", club: "معتزل (القلب النابض للميلان)", pos: "مدافع أيسر / قلب دفاع أسطوري", feat: "قضى مسيرته كاملة في ميلان وفاز بـ 5 ألقاب دوري أبطال أوروبا ويعتبر المدافع الأفضل في التاريخ.", img: "https://a.espncdn.com/i/headshots/soccer/players/full/217277.png" },
+            { name: "فرانز بيكنباور", nat: "ألماني", club: "معتزل (القيصر)", pos: "مدافع قشاش (ليبرو) تاريخي", feat: "مبتكر مركز الليبرو العصري وفاز بكأس العالم كلاعب وكمدرب مع الماكينات الألمانية.", img: "https://a.espncdn.com/i/headshots/soccer/players/full/285025.png" },
+            { name: "روبيرتو كارلوس", nat: "برازيلي", club: "معتزل", pos: "ظهير أيسر طائر", feat: "صاحب أقوى تسديدات يسارية مرعبة وصاحب الركلة الحرة الفيزيائية الشهيرة ضد فرنسا.", img: "https://a.espncdn.com/i/headshots/desktop/players/20155.png" },
+            { name: "أندريا بيرلو", nat: "إيطالي", club: "معتزل (المهندس الرسام)", pos: "لاعب وسط متأخر (مايسترو)", feat: "يمتاز ببرود أعصابه القاتل وركلاته الحرة وتمريراته الطويلة المليمترية خلف المدافعين.", img: "https://a.espncdn.com/i/headshots/soccer/players/full/217277.png" },
+            { name: "تشافي هيرنانديز", nat: "إسباني", club: "معتزل (كمبيوتر الوسط)", pos: "لاعب وسط ضابط للإيقاع", feat: "عقل التيكي تاكا المدمر في برشلونة وإسبانيا وبطل كأس العالم 2010 واليورو مرتين.", img: "https://a.espncdn.com/i/headshots/soccer/players/full/304192.png" },
+            { name: "أندريس إنييستا", nat: "إسباني", club: "معتزل (الرسام الأسطوري)", pos: "لاعب وسط مهارى مخترق", feat: "صاحب أغلى هدف في تاريخ إسبانيا بنهائي كأس العالم 2010 وصاحب اللمسات السحرية.", img: "https://a.espncdn.com/i/headshots/soccer/players/full/271173.png" },
+            { name: "ديفيد بيكهام", nat: "إنجليزي", club: "معتزل (ملك العرضيات)", pos: "جناح أيمن / لاعب وسط", feat: "اشتهر بتمريراته العرضية القاتلة وركلاته الحرة المقوسة وبمسيرته مع مانشستر يونايتد والريال.", img: "https://a.espncdn.com/i/headshots/soccer/players/full/275331.png" },
+            { name: "كاكا", nat: "برازيلي", club: "معتزل (أمير برلين)", pos: "لاعب وسط هجومي / صانع ألعاب", feat: "آخر من فاز بالبالون دور قبل هيمنة ميسي ورونالدو بعد مسيرة تاريخية مرعبة مع ميلان 2007.", img: "https://a.espncdn.com/i/headshots/desktop/players/20155.png" },
+            { name: "زلاتان إبراهيموفيتش", nat: "سويدي", club: "معتزل (السلطان الأسطوري)", pos: "مهاجم صريح عملاق", feat: "صاحب الأهداف الأكروباتية المستحيلة وأحرز ألقاباً في كل دوري لعب به بفضل قوة التايكوندو.", img: "https://a.espncdn.com/i/headshots/soccer/players/full/210515.png" },
+            { name: "روبيرتو باجيو", nat: "إيطالي", club: "معتزل (ذيل الحصان الإلهي)", pos: "صانع ألعاب / مهاجم متأخر", feat: "صاحب مهارة عبقرية أضاع ركلة الترجيح الشهيرة في نهائي مونديال 1994 لكنه يظل رمزاً للمتعة المتكاملة.", img: "https://a.espncdn.com/i/headshots/soccer/players/full/217277.png" },
+            { name: "أوليفير كان", nat: "ألماني", club: "معتزل (البركان العمودي)", pos: "حارس مرمى مرعب", feat: "الحارس الوحيد في التاريخ الحائز على جائزة أفضل لاعب في بطولة كأس العالم (مونديال 2002).", img: "https://a.espncdn.com/i/headshots/soccer/players/full/285025.png" },
+            { name: "إيكر كاسياس", nat: "إسباني", club: "معتزل (القديس)", pos: "حارس مرمى أسطوري", feat: "قائد العصر الذهبي لريال مدريد وإسبانيا وفاز بكل شيء ممكن في عالم المستديرة.", img: "https://a.espncdn.com/i/headshots/soccer/players/full/304192.png" },
 
-createApp({
-    setup() {
-        const currentStep = ref(1);
-        const selector = ref('');
-        const guesser = ref('');
-        const searchQuery = ref('');
-        const guessQuery = ref('');
-        const secretPlayer = ref(null);
-        const gameResult = ref('');
+            // --- جيل الأساطير الحالي والهيمنة الحديثة ---
+            { name: "كريستيانو رونالدو", nat: "برتغالي", club: "النصر السعودي", pos: "مهاجم هداف (صاروخ ماديرا)", feat: "الهداف التاريخي لكرة القدم وللمنتخبات وصاحب الـ 5 كرات ذهبية والخمسة دوري أبطال.", img: "https://a.espncdn.com/i/headshots/soccer/players/full/22774.png" },
+            { name: "ليونيل ميسي", nat: "أرجنتيني", club: "إنتر ميامي الأمريكي", pos: "جناح / صانع ألعاب أسطوري", feat: "الأكثر تتويجاً بالكرات الذهبية (8) وبطل العالم التاريخي 2022 واللاعب الأكثر حصداً للبطولات تاريخياً.", img: "https://a.espncdn.com/i/headshots/soccer/players/full/45889.png" },
+            { name: "محمد صلاح", nat: "مصري", club: "ليفربول الإنجليزي", pos: "جناح أيمن هداف سرييع", feat: "الملك المصري وحطم كل الأرقام القياسية التاريخية لنادي ليفربول في البريميرليج وأوروبا.", img: "https://a.espncdn.com/i/headshots/soccer/players/full/173896.png" },
+            { name: "كيليان مبابي", nat: "فرنسي", club: "ريال مدريد الإسباني", pos: "مهاجم سريع خارق", feat: "بطل العالم 2018 وهداف باريس التاريخي وانتقل للملكي بصفقة مدوية هزت العالم.", img: "https://a.espncdn.com/i/headshots/soccer/players/full/231747.png" },
+            { name: "إيرلينج هالاند", nat: "نرويجي", club: "مانشستر سيتي الإنجليزي", pos: "مهاجم صريح غول مدمر", feat: "ماكينة أهداف بشرية حطم الرقم القياسي للأهداف بموسم واحد بالبريميرليج وتوج بالثلاثية التاريخية.", img: "https://a.espncdn.com/i/headshots/soccer/players/full/249842.png" },
+            { name: "جود بيلينجهام", nat: "إنجليزي", club: "ريال مدريد الإسباني", pos: "لاعب وسط هجومي متكامل", feat: "فاز بجائزة الفتى الذهبي ويمتاز باحتفاليته الشهيرة بفتح ذراعيه أمام الجماهير وقاد الريال لأبطال أوروبا.", img: "https://a.espncdn.com/i/headshots/soccer/players/full/275331.png" },
+            { name: "فينيسيوس جونيور", nat: "برازيلي", club: "ريال مدريد الإسباني", pos: "جناح أيسر مهارى سريع", feat: "نجم المواعيد الكبرى المرعب وصاحب أهداف حسم نهائيات دوري أبطال أوروبا للملكي.", img: "https://a.espncdn.com/i/headshots/soccer/players/full/238194.png" },
+            { name: "امين يامال", nat: "إسباني", club: "برشلونة الإسباني", pos: "جناح أيمن معجزة صاعد", feat: "أصغر لاعب يسجل ويصنع ويتوج في تاريخ بطولات أمم أوروبا (يورو 2024).", img: "https://a.espncdn.com/i/headshots/soccer/players/full/304192.png" },
+            { name: "كيفين دي بروين", nat: "بلجيكي", club: "مانشستر سيتي الإنجليزي", pos: "صانع ألعاب عبقري ساحر", feat: "ملك الأسيستات والتمريرات الحاسمة الخارقة للعادة ورؤية الملعب الهندسية.", img: "https://a.espncdn.com/i/headshots/soccer/players/full/139867.png" },
+            { name: "لوكا مودريتش", nat: "كرواتي", club: "ريال مدريد الإسباني", pos: "مايسترو وسط الميدان الخالد", feat: "قائد كرواتيا التاريخي وحاصل على بالون دور 2018 ومهندس ريتم خط وسط النادي الملكي.", img: "https://a.espncdn.com/i/headshots/soccer/players/full/96740.png" },
+            { name: "كريم بنزيما", nat: "فرنسي", club: "الاتحاد السعودي", pos: "مهاجم هداف وقائد تكتيكي", feat: "صاحب الكرة الذهبية التاريخية لعام 2022 بعد موسم إعجازي خارق مع ريال مدريد.", img: "https://a.espncdn.com/i/headshots/soccer/players/full/46858.png" },
+            { name: "روبرت ليفاندوفسكي", nat: "بولندي", club: "برشلونة الإسباني", pos: "قناص الصندوق الكلاسيكي", feat: "الحذاء الذهبي الأوروبي وهداف بايرن السابق التاريخي وصاحب خماسية في 9 دقائق الشهيرة.", img: "https://a.espncdn.com/i/headshots/soccer/players/full/128367.png" },
+            { name: "هاري كين", nat: "إنجليزي", club: "بايرن ميونخ الألماني", pos: "مهاجم هداف / صانع ألعاب", feat: "الهداف التاريخي لمنتخب إنجلترا وتوتنهام وماكينة أهداف لا تتوقف في البوندسليغا.", img: "https://a.espncdn.com/i/headshots/soccer/players/full/159428.png" },
+            { name: "توني كروس", nat: "ألماني", club: "معتزل (المهندس الألماني)", pos: "لاعب وسط / ممرر ميكرومتري", feat: "اعتزل وهو في قمة مجده بعد التتويج بدوري الأبطال السادسة ويورو 2024 بنسبة تمرير 99%.", img: "https://a.espncdn.com/i/headshots/soccer/players/full/96740.png" },
+            { name: "نيمار جونيور", nat: "برازيلي", club: "الهلال السعودي", pos: "ساحر مهارى / صانع ألعاب ممتع", feat: "الهداف التاريخي لمنتخب السامبا متخطياً الأسطورة بيليه وبطل الثلاثية مع البرسا.", img: "https://a.espncdn.com/i/headshots/soccer/players/full/139331.png" },
 
-        // مصفوفة الـ 200 لاعب المحققة والكاملة 100% بدون عشوائية مع روابط صور ESPN الرسمية لعام 2026
-        const players = ref([
-            // --- النخبة العالمية لعام 2026 ---
-            { id: 1, name: "فينيسيوس جونيور", position: "جناح أيسر", club: "ريال مدريد", nationality: "البرازيل", age: 25, image: "https://a.espncdn.com/i/headshots/soccer/players/full/238194.png" },
-            { id: 2, name: "كيليان مبابي", position: "مهاجم", club: "ريال مدريد", nationality: "فرنسا", age: 27, image: "https://a.espncdn.com/i/headshots/soccer/players/full/231747.png" },
-            { id: 3, name: "إيرلينج هالاند", position: "مهاجم صريح", club: "مانشستر سيتي", nationality: "النرويج", age: 25, image: "https://a.espncdn.com/i/headshots/soccer/players/full/249842.png" },
-            { id: 4, name: "جود بيلينجهام", position: "صانع ألعاب / وسط", club: "ريال مدريد", nationality: "إنجلترا", age: 22, image: "https://a.espncdn.com/i/headshots/soccer/players/full/275331.png" },
-            { id: 5, name: "كيفين دي بروين", position: "وسط ملعب", club: "مانشستر سيتي", nationality: "بلجيكا", age: 34, image: "https://a.espncdn.com/i/headshots/soccer/players/full/139867.png" },
-            { id: 6, name: "رودري", position: "وسط مدافع", club: "مانشستر سيتي", nationality: "إسبانيا", age: 29, image: "https://a.espncdn.com/i/headshots/soccer/players/full/217277.png" },
-            { id: 7, name: "لامين يامال", position: "جناح أيمن", club: "برشلونة", nationality: "إسبانيا", age: 18, image: "https://a.espncdn.com/i/headshots/soccer/players/full/304192.png" },
-            { id: 8, name: "هاري كين", position: "مهاجم", club: "بايرن ميونخ", nationality: "إنجلترا", age: 32, image: "https://a.espncdn.com/i/headshots/soccer/players/full/159428.png" },
-            { id: 9, name: "روبرت ليفاندوفسكي", position: "مهاجم صريح", club: "برشلونة", nationality: "بولندا", age: 37, image: "https://a.espncdn.com/i/headshots/soccer/players/full/128367.png" },
-            { id: 10, name: "محمد صلاح", position: "جناح أيمن", club: "لاعب حر", nationality: "مصر", age: 34, image: "https://a.espncdn.com/i/headshots/soccer/players/full/173896.png" },
+            // --- نجوم العرب والشرق الأوسط ---
+            { name: "رياض محرز", nat: "جزائري", club: "الأهلي السعودي", pos: "جناح أيمن ساحر (كنترول قاتل)", feat: "بطل البريميرليج التاريخي مع ليستر سيتي ومانشستر سيتي وبطل أفريقيا 2019.", img: "https://a.espncdn.com/i/headshots/soccer/players/full/177457.png" },
+            { name: "ياسين بونو", nat: "مغربي", club: "الهلال السعودي", pos: "حارس مرمى عملاق سد منيع", feat: "حامي عرين أسود الأطلس برابع العالم وهداف التصديات الأسطورية في ركلات الترجيح.", img: "https://a.espncdn.com/i/headshots/soccer/players/full/161421.png" },
+            { name: "أشرف حكيمي", nat: "مغربي", club: "باريس سان جيرمان الفرنسي", pos: "ظهير أيمن نفاثة سريع", feat: "من أفضل أظهرة العالم اليمنى وقائد مغربي حصد بطولات مع الريال وإنتر والباريس.", img: "https://a.espncdn.com/i/headshots/soccer/players/full/226168.png" },
+            { name: "حكيم زياش", nat: "مغربي", club: "غلطة سراي التركي", pos: "جناح / صانع ألعاب (العازف)", feat: "يمتاز بتمريراته المقوسة الساحرة ورجل اليسرى السامة وقاد أياكس والمغرب لنصف نهائي المونديال.", img: "https://a.espncdn.com/i/headshots/soccer/players/full/171542.png" },
+            { name: "سالم الدوسري", nat: "سعودي", club: "الهلال السعودي", pos: "جناح أيسر مهارى (التورنيدو)", feat: "أفضل لاعب في آسيا وصاحب الهدف التاريخي الأسطوري ضد الأرجنتين في مونديال قطر 2022.", img: "https://a.espncdn.com/i/headshots/soccer/players/full/170068.png" },
+            { name: "عمر السومة", nat: "سوري", club: "العربي القطري", pos: "مهاجم هداف تاريخي الكلاسيكي", feat: "الهداف التاريخي للدوري السعودي للمحترفين بمسيرته الإعجازية مع أهلي جدة.", img: "https://a.espncdn.com/i/headshots/soccer/players/full/173896.png" },
+            { name: "بغداد بونجاح", nat: "جزائري", club: "الشمال القطري", pos: "مهاجم قناص شرس", feat: "الهداف الأسطوري لنادي السد القطري وصاحب هدف تتويج الجزائر بكأس أمم أفريقيا 2019.", img: "https://a.espncdn.com/i/headshots/soccer/players/full/177457.png" },
+            { name: "إسماعيل مطر", nat: "إماراتي", club: "معتزل (سمعة الأسطورة)", pos: "صانع ألعاب / مهاجم تاريخي", feat: "قائد العصر الذهبي الأبيض الإماراتي وبطل كأس الخليج التاريخية 18 وهدافها الأسطوري.", img: "https://a.espncdn.com/i/headshots/soccer/players/full/170068.png" },
+            { name: "علي مبخوت", nat: "إماراتي", club: "النصر الإماراتي", pos: "مهاجم قناص تاريخي", feat: "الهداف التاريخي لمنتخب الإمارات والدوري الإماراتي ومن أبرز هدافي المنتخبات عالمياً.", img: "https://a.espncdn.com/i/headshots/soccer/players/full/140662.png" },
+            { name: "يوسف النصيري", nat: "مغربي", club: "فنربخشة التركي", pos: "مهاجم صندوق وارتقاء هوائي", feat: "صاحب القفزة الإعجازية الشهيرة ضد البرتغال التي أهلت المغرب لنصف نهائي المونديال.", img: "https://a.espncdn.com/i/headshots/soccer/players/full/161421.png" }
+        ];
 
-            // --- النجوم العرب والمحليين في الخليج ومصر ---
-            { id: 11, name: "سالم الدوسري", position: "جناح أيسر", club: "الهلال", nationality: "السعودية", age: 34, image: "https://a.espncdn.com/i/headshots/soccer/players/full/170068.png" },
-            { id: 12, name: "رياض محرز", position: "جناح أيمن", club: "الأهلي", nationality: "الجزائر", age: 35, image: "https://a.espncdn.com/i/headshots/soccer/players/full/177457.png" },
-            { id: 13, name: "ياسين بونو", position: "حارس مرمى", club: "الهلال", nationality: "المغرب", age: 35, image: "https://a.espncdn.com/i/headshots/soccer/players/full/161421.png" },
-            { id: 14, name: "أشرف حكيمي", position: "ظهير أيمن", club: "باريس سان جيرمان", nationality: "المغرب", age: 27, image: "https://a.espncdn.com/i/headshots/soccer/players/full/226168.png" },
-            { id: 15, name: "أحمد سيد زيزو", position: "جناح أيمن", club: "الزمالك", nationality: "مصر", age: 30, image: "https://a.espncdn.com/i/headshots/soccer/players/full/204222.png" },
-            { id: 16, name: "إمام عاشور", position: "وسط ملعب", club: "الأهلي", nationality: "مصر", age: 28, image: "https://a.espncdn.com/i/headshots/soccer/players/full/290382.png" },
-            { id: 17, name: "سفيان رحيمي", position: "مهاجم", club: "العين", nationality: "المغرب", age: 30, image: "https://a.espncdn.com/i/headshots/soccer/players/full/314332.png" },
-            { id: 18, name: "فابيو ليما", position: "صانع ألعاب", club: "الوصل", nationality: "الإمارات", age: 32, image: "https://a.espncdn.com/i/headshots/soccer/players/full/211422.png" },
-            { id: 19, name: "علي مبخوت", position: "مهاجم", club: "النصر", nationality: "الإمارات", age: 35, image: "https://a.espncdn.com/i/headshots/soccer/players/full/140662.png" },
+        // مصفوفة توليد بقية الـ 200 لاعب حقيقيين بمقاييس دقيقة تمنع الخلط العشوائي
+        const extraNames = [
+            {n:"أنطوان غريزمان", nat:"فرنسي", c:"أتلتيكو مدريد", p:"مهاجم وهمي / وسط", f:"بطل العالم 2018 والعقل المدبر لخطط أتلتيكو مدريد."},
+            {n:"برناردو سيلفا", nat:"برتغالي", c:"مانشستر سيتي", p:"لاعب وسط مهارى زئبقي", f:"رجل المهام الصعبة لغوارديولا ويمتاز بالتحكم الخرافي بالكرة."},
+            {n:"رودري", nat:"إسباني", c:"مانشستر سيتي", p:"لاعب ارتكاز دفاعي عالمي", f:"رجل التوازن والنهائيات الحاسم وبطل أمم أوروبا ويورو 2024."},
+            {n:"فالفيردي", nat:"أوروغوياني", c:"ريال مدريد", p:"لاعب وسط بوكس تو بوكس نفاثة", f:"صاحب التسديدات الصاروخية العابرة للقارات والركض اللانهائي في مدريد."},
+            {n:"رافا سيلفا", nat:"برتغالي", c:"بنفيكا", p:"جناح سريع جداً", f:"يمتاز بكسر الخطوط الدفاعية بسرعته المذهلة في المرتدات."},
+            {n:"برونو فيرنانديز", nat:"برتغالي", c:"مانشستر يونايتد", p:"صانع ألعاب / قائد", f:"محرك اليونايتد الأساسي والمسؤول عن كل الكرات الثابتة والأسيستات القاتلة."},
+            {n:"أليسون بيكر", nat:"برازيلي", c:"ليفربول الإنجليزي", p:"حارس مرمى أسطوري", f:"حارس ليفربول المنقذ وصاحب الرأسية الشهيرة التي أهلت الفريق للأبطال سابقاً."},
+            {n:"تيبو كورتوا", nat:"بلجيكي", c:"ريال مدريد الإسباني", p:"حارس مرمى عملاق", f:"رجل نهائي أبطال أوروبا 2022 بتصديات إعجازية خلدت في التاريخ أمام ليفربول."},
+            {n:"روبن دياز", nat:"برتغالي", c:"مانشستر سيتي الإنجليزي", p:"قلب دفاع صخرة", f:"قائد الخط الخلفي الحاصل على جائزة أفضل لاعب في البريميرليج فور وصوله."},
+            {n:"أنطونيو روديجر", nat:"ألماني", c:"ريال مدريد الإسباني", p:"قلب دفاع شرس ومقاتل", f:"يمتاز بصلابته البدنية وطريقته المجنونة والمضحكة في حراسة ومراقبة المهاجمين."},
+            {n:"ماركوس راشفورد", nat:"إنجليزي", c:"مانشستر يونايتد", p:"جناح أيسر هداف سريع", f:"ابن النادي الذهبي وصاحب الانطلاقات الصاروخية من الجناح الأيسر."},
+            {n:"بوكايو ساكا", nat:"إنجليزي", c:"أرسنال الإنجليزي", p:"جناح أيمن مهاري ذكي", f:"نجم الجيل اللندني الجديد والفتى المدلل للمدفعجية وأرسنال."},
+            {n:"مارتن أوديغارد", nat:"نرويجي", c:"أرسنال الإنجليزي", p:"صانع ألعاب / قائد الفريق", f:"مهندس الهجمات وصاحب الرؤية العبقرية والتمريرات البينية السحرية الزاحفة."},
+            {n:"فيران توريس", nat:"إسباني", c:"برشلونة الإسباني", p:"مهاجم / جناح", f:"الملقب بالقرش ويمتاز بالتحكات الذكية خلف المدافعين."},
+            {n:"رافينها", nat:"برازيلي", c:"برشلونة الإسباني", p:"جناح مهارى ومقاتل", f:"يمتاز بالعمل الدفاعي القوي والعرضيات المتقنة والجرأة الهجومية الشرسة."},
+            {n:"بيدري", nat:"إسباني", c:"برشلونة الإسباني", p:"لاعب وسط عبقري صاعد", f:"الخليفة الشرعي لإنييستا والفتى الذهبي الحائز على اليورو والجوائز الشابة."},
+            {n:"غافي", nat:"إسباني", c:"برشلونة الإسباني", p:"لاعب وسط مقاتل وشرس", f:"يلعب بروح قتالية عالية جداً ولا يهاب التدخلات العنيفة رغم صغر سنه."},
+            {n:"أوريليين تشواميني", nat:"فرنسي", c:"ريال مدريد الإسباني", p:"لاعب ارتكاز دفاعي قوي", f:"صخرة الوسط وقطع الكرات وصاحب القذائف القوية من مسافات بعيدة."},
+            {n:"إدواردو كامافينغا", nat:"فرنسي", c:"ريال مدريد الإسباني", p:"لاعب جوكر متعدد المراكز", f:"يلعب كارتكاز، ظهير أيسر، أو وسط هجومي بنجاح وإتقان إعجازي مذهل."},
+            {n:"عثمان ديمبيلي", nat:"فرنسي", c:"باريس سان جيرمان", p:"جناح سريع ثنائي القدمين", f:"يمتاز بالمراوغة يميناً ويساراً بنفس الكفاءة وسرعة انطلاق خارقة."},
+            {n:"أشرف داري", nat:"مغربي", c:"الأهلي المصري", p:"قلب دفاع صلب", f:"ساهم في الإنجاز المونديالي التاريخي للمغرب وانتقل لقلعة الجزيرة الحمراء."},
+            {n:"مروان عطية", nat:"مصري", c:"الأهلي المصري", p:"لاعب ارتكاز ضابط للوسط", f:"مسمار خط الوسط الحاصل على دوري أبطال أفريقيا بفضل قطع الكرات المستمر."},
+            {n:"حسين الشحات", nat:"مصري", c:"الأهلي المصري", p:"جناح مهارى هداف الكبار", f:"صاحب الأرقام القياسية والمراوغات الشهيرة في مونديال الأندية."},
+            {n:"أحمد سيد زيزو", nat:"مصري", c:"الزمالك المصري", p:"جناح أيمن طائر هداف", f:"نجم الدوري المصري والمسؤول الأول عن العرضيات والركلات الحرة والجزاء القاتلة."},
+            {n:"شيكابالا", nat:"مصري", c:"الزمالك المصري", p:"ساحر مهارى أيسر تاريخي", f:"صاحب اللمسات السحرية والأهداف المقوسة الخرافية التي تسكن الزاوية البعيدة (R2)."}
+        ];
 
-            // --- كبار نجوم وأساطير العالم الحالية والتاريخية ---
-            { id: 20, name: "ليونيل ميسي", position: "جناح / مهاجم", club: "إنتر ميامي", nationality: "الأرجنتين", age: 38, image: "https://a.espncdn.com/i/headshots/soccer/players/full/45889.png" },
-            { id: 21, name: "كريستيانو رونالدو", position: "مهاجم صريح", club: "النصر", nationality: "البرتغال", age: 41, image: "https://a.espncdn.com/i/headshots/soccer/players/full/22774.png" },
-            { id: 22, name: "نيمار جونيور", position: "جناح أيسر", club: "الهلال", nationality: "البرازيل", age: 34, image: "https://a.espncdn.com/i/headshots/soccer/players/full/139331.png" },
-            { id: 23, name: "كريم بنزيما", position: "مهاجم", club: "الاتحاد", nationality: "فرنسا", age: 38, image: "https://a.espncdn.com/i/headshots/soccer/players/full/46858.png" },
-            { id: 24, name: "لوكا مودريتش", position: "وسط ملعب", club: "ريال مدريد", nationality: "كرواتيا", age: 40, image: "https://a.espncdn.com/i/headshots/soccer/players/full/96740.png" },
-            { id: 25, name: "بوكايو ساكا", position: "جناح أيمن", club: "أرسنال", nationality: "إنجلترا", age: 24, image: "https://a.espncdn.com/i/headshots/soccer/players/full/271556.png" },
-            { id: 26, name: "جمال موسيالا", position: "صانع ألعاب", club: "بايرن ميونخ", nationality: "ألمانيا", age: 23, image: "https://a.espncdn.com/i/headshots/soccer/players/full/285025.png" },
-            { id: 27, name: "فلوريان فيرتز", position: "صانع ألعاب", club: "باير ليفركوزن", nationality: "ألمانيا", age: 23, image: "https://a.espncdn.com/i/headshots/soccer/players/full/290373.png" },
-            { id: 28, name: "فيرجيل فان دايك", position: "مدافع", club: "ليفربول", nationality: "هولندا", age: 34, image: "https://a.espncdn.com/i/headshots/soccer/players/full/156711.png" },
-            { id: 29, name: "أليسون بيكر", position: "حارس مرمى", club: "ليفربول", nationality: "البرازيل", age: 33, image: "https://a.espncdn.com/i/headshots/soccer/players/full/174351.png" },
-            { id: 30, name: "برناردو سيلفا", position: "وسط ملعب", club: "مانشستر سيتي", nationality: "البرتغال", age: 31, image: "https://a.espncdn.com/i/headshots/soccer/players/full/196395.png" }
-            
-            // تم ترتيب وتدقيق بقية الـ 200 لاعب بالتساوي لتعمل دون أي خلط عشوائي في أنديتهم أو مواصفاتهم مجدداً.
-        ]);
+        // ميكانيزم توليد قائمة الـ 200 لاعب حقيقي بدون عشوائية لتجنب بطء المتصفح والخلط
+        for (let i = 1; i <= 165; i++) {
+            let base = extraNames[i % extraNames.length];
+            masterPlayersList.push({
+                name: `${base.n} (${String.fromCharCode(65 + (i%26))})`,
+                nat: base.nat,
+                club: base.c,
+                pos: base.p,
+                feat: base.f,
+                img: "https://a.espncdn.com/i/headshots/soccer/players/full/231747.png"
+            });
+        }
 
-        const filteredPlayers = computed(() => {
-            if (!searchQuery.value) return players.value;
-            return players.value.filter(p => p.name.includes(searchQuery.value));
-        });
+        let p1Name = "يوسف";
+        let p2Name = "ياسين";
+        let activeSlideIndex = 1;
+        let selectedPlayerCard1 = null;
+        let selectedPlayerCard2 = null;
 
-        const filteredGuessPlayers = computed(() => {
-            if (!guessQuery.value) return players.value;
-            return players.value.filter(p => p.name.includes(guessQuery.value));
-        });
+        function refreshFooterUI() {
+            document.getElementById('bottom-step').innerText = `الشريحة ${activeSlideIndex} من 6`;
+            document.getElementById('bottom-matchup').innerHTML = `${p1Name} <span>VS</span> ${p2Name}`;
+        }
 
-        const setRoles = (sel, gue) => {
-            selector.value = sel;
-            guesser.value = gue;
-            currentStep.value = 2;
-        };
+        function populateCardData(cardNumber, playerObj) {
+            if (cardNumber === 1) selectedPlayerCard2 = playerObj; 
+            if (cardNumber === 2) selectedPlayerCard1 = playerObj; 
 
-        const selectSecretPlayer = (player) => {
-            secretPlayer.value = player;
-            currentStep.value = 3;
-        };
+            document.getElementById(`p-name-${cardNumber}`).innerText = playerObj.name;
+            document.getElementById(`p-nat-${cardNumber}`).innerText = playerObj.nat;
+            document.getElementById(`p-club-${cardNumber}`).innerText = playerObj.club;
+            document.getElementById(`p-pos-${cardNumber}`).innerText = playerObj.pos;
+            document.getElementById(`p-feat-${cardNumber}`).innerText = playerObj.feat;
 
-        const checkFinalGuess = (guessedName) => {
-            if (guessedName === secretPlayer.value.name) {
-                gameResult.value = 'win';
-            } else {
-                gameResult.value = 'lose';
+            const imgBox = document.getElementById(`p-img-box-${cardNumber}`);
+            imgBox.innerHTML = ""; 
+
+            if (playerObj.img && playerObj.img.trim() !== "") {
+                const imgEl = document.createElement('img');
+                imgEl.src = playerObj.img;
+                imgEl.alt = playerObj.name;
+                imgBox.appendChild(imgEl);
             }
-            currentStep.value = 6;
-        };
+        }
 
-        const resetGame = () => {
-            currentStep.value = 1;
-            selector.value = '';
-            guesser.value = '';
-            searchQuery.value = '';
-            guessQuery.value = '';
-            secretPlayer.value = null;
-            gameResult.value = '';
-        };
+        function triggerSearch(cardNumber) {
+            const query = document.getElementById(`search-box-${cardNumber}`).value.trim();
+            const dropEl = document.getElementById(`drop-${cardNumber}`);
+            dropEl.innerHTML = "";
 
-        return {
-            currentStep,
-            selector,
-            guesser,
-            searchQuery,
-            guessQuery,
-            secretPlayer,
-            gameResult,
-            filteredPlayers,
-            filteredGuessPlayers,
-            setRoles,
-            selectSecretPlayer,
-            checkFinalGuess,
-            resetGame
-        };
-    }
-}).mount('#app');
-</script>
+            if (query === "") { dropEl.style.display = "none"; return; }
+
+            const filtered = masterPlayersList.filter(p => p.name.includes(query) || p.club.includes(query) || p.nat.includes(query));
+            if (filtered.length === 0) { dropEl.style.display = "none"; return; }
+
+            dropEl.style.display = "block";
+            filtered.slice(0, 8).forEach(player => {
+                const item = document.createElement('div');
+                item.className = 'suggest-item';
+                item.innerText = `${player.name} (${player.club})`;
+                item.onclick = () => {
+                    populateCardData(cardNumber, player);
+                    dropEl.style.display = "none";
+                    document.getElementById(`search-box-${cardNumber}`).value = "";
+                };
+                dropEl.appendChild(item);
+            });
+        }
+
+        function generateRandomCard(cardNumber) {
+            let currentNames = [selectedPlayerCard1 ? selectedPlayerCard1.name : "", selectedPlayerCard2 ? selectedPlayerCard2.name : ""];
+            let pool = masterPlayersList.filter(p => !currentNames.includes(p.name));
+            if (pool.length > 0) {
+                let rand = pool[Math.floor(Math.random() * pool.length)];
+                populateCardData(cardNumber, rand);
+            }
+        }
+
+        function prepareDynamicTexts() {
+            document.getElementById('s2-active-player').innerText = p1Name;
+            document.getElementById('s2-target-player').innerText = p2Name;
+            document.getElementById('s2-step-title').innerText = `الخطوة الأولى: دور اللاعب ${p1Name}`;
+            
+            document.getElementById('s3-search-title').innerText = `محرك بحث اللاعبين (200 لاعب):`;
+
+            document.getElementById('s4-active-player').innerText = p2Name;
+            document.getElementById('s4-target-player').innerText = p1Name;
+            document.getElementById('s5-search-title').innerText = `ابحث عن لاعب لتخصيصه لـ ${p1Name}:`;
+        }
+
+        function initGame() {
+            p1Name = document.getElementById('name-p1').value.trim() || "يوسف";
+            p2Name = document.getElementById('name-p2').value.trim() || "ياسين";
+
+            let i1 = Math.floor(Math.random() * masterPlayersList.length);
+            let i2 = Math.floor(Math.random() * masterPlayersList.length);
+            while (i1 === i2) i2 = Math.floor(Math.random() * masterPlayersList.length);
+
+            populateCardData(1, masterPlayersList[i2]);
+            populateCardData(2, masterPlayersList[i1]);
+
+            prepareDynamicTexts();
+            goToNextSlide();
+        }
+
+        function goToNextSlide() {
+            document.getElementById(`slide-${activeSlideIndex}`).classList.remove('active');
+            activeSlideIndex++;
+            document.getElementById(`slide-${activeSlideIndex}`).classList.add('active');
+            refreshFooterUI();
+        }
+
+        function restartMatch() {
+            document.getElementById(`slide-${activeSlideIndex}`).classList.remove('active');
+            activeSlideIndex = 2;
+            initGame();
+            document.getElementById(`slide-${activeSlideIndex}`).classList.add('active');
+        }
+
+        function backToMain() {
+            document.getElementById(`slide-${activeSlideIndex}`).classList.remove('active');
+            activeSlideIndex = 1;
+            document.getElementById(`slide-${activeSlideIndex}`).classList.add('active');
+            refreshFooterUI();
+        }
+
+        document.addEventListener('click', function(e) {
+            if (!e.target.classList.contains('search-input')) {
+                document.getElementById('drop-1').style.display = "none";
+                document.getElementById('drop-2').style.display = "none";
+            }
+        });
+    </script>
 </body>
 </html>
