@@ -431,7 +431,7 @@
                 <button class="mode-card-btn" onclick="activateGameMode('multi')">
                     <i class="fa-solid fa-users"></i>
                     <span>لاعبين</span>
-                    <p>التحدي السري التبادلي الممتع (يوسف ضد ياسين).</p>
+                    <p>التحدي السري التبادلي الممتع .</p>
                 </button>
             </div>
         </div>
@@ -480,20 +480,20 @@
                 <p style="color: var(--text-muted); margin-bottom: 30px;">أدخل أسماء اللاعبين لبدء التحدي</p>
                 <div class="setup-group">
                     <label>اللاعب الأول:</label>
-                    <input type="text" id="name-p1" value="يوسف">
+                    <input type="text" id="name-p1" value="">
                 </div>
                 <div class="setup-group">
                     <label>اللاعب الثاني:</label>
-                    <input type="text" id="name-p2" value="ياسين">
+                    <input type="text" id="name-p2" value="">
                 </div>
                 <button class="btn-yellow-submit" style="max-width: 250px; margin-top: 20px;" onclick="initGame()">ابدأ اللعبة الجولة <i class="fa-solid fa-arrow-left"></i></button>
             </div>
 
             <div class="slide" id="slide-2">
                 <div style="font-size: 1.2rem; color: var(--primary-yellow); font-weight: 700;" id="s2-step-title">الخطوة الأولى: دور اللاعب الأول</div>
-                <div class="huge-player-name" id="s2-active-player">يوسف</div>
+                <div class="huge-player-name" id="s2-active-player"></div>
                 <div class="alert-box">
-                    <i class="fa-solid fa-eye-slash"></i> غَمِّض عينك تماماً يا <span id="s2-target-player">ياسين</span>
+                    <i class="fa-solid fa-eye-slash"></i> غَمِّض عينك تماماً يا <span id="s2-target-player"></span>
                 </div>
                 <button class="btn-yellow-submit" style="max-width: 250px;" onclick="goToNextSlide()">رؤية مواصفات اللاعب <i class="fa-solid fa-arrow-left"></i></button>
             </div>
