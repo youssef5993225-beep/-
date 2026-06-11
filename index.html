@@ -529,9 +529,9 @@
 
             <div class="slide" id="slide-4">
                 <div style="font-size: 1.2rem; color: var(--primary-yellow); font-weight: 700;">الخطوة الثانية: دور اللاعب الثاني</div>
-                <div class="huge-player-name" id="s4-active-player">ياسين</div>
+                <div class="huge-player-name" id="s4-active-player"></div>
                 <div class="alert-box">
-                    <i class="fa-solid fa-eye-slash"></i> غَمِّض عينك تماماً يا <span id="s4-target-player">يوسف</span>
+                    <i class="fa-solid fa-eye-slash"></i> غَمِّض عينك تماماً يا <span id="s4-target-player"></span>
                 </div>
                 <button class="btn-yellow-submit" style="max-width: 250px;" onclick="goToNextSlide()">رؤية مواصفات اللاعب <i class="fa-solid fa-arrow-left"></i></button>
             </div>
@@ -690,8 +690,8 @@
             });
         }
 
-        let p1Name = "يوسف";
-        let p2Name = "ياسين";
+        let p1Name = "";
+        let p2Name = "";
         let activeSlideIndex = 1;
         let selectedPlayerCard1 = null;
         let selectedPlayerCard2 = null;
