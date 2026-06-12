@@ -4,6 +4,7 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>تحدي تخمين اللاعبين الأسطوري</title>
+    <!-- خط القاهرة وأيقونات FontAwesome الاحترافية -->
     <link href="https://fonts.googleapis.com/css2?family=Cairo:wght=400;600;700;900&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
     
@@ -66,6 +67,21 @@
             margin-bottom: 40px;
         }
 
+        /* شريط إحصائيات النقاط الثابتة في الشاشة الرئيسية */
+        .score-badge-global {
+            background: rgba(241, 196, 15, 0.1);
+            border: 1px solid var(--primary-yellow);
+            padding: 8px 20px;
+            border-radius: 50px;
+            font-size: 1.1rem;
+            font-weight: 700;
+            color: var(--primary-yellow);
+            margin-bottom: 25px;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+
         .menu-mode-buttons {
             display: flex;
             gap: 25px;
@@ -85,6 +101,7 @@
             flex-direction: column;
             align-items: center;
             gap: 15px;
+            width: 100%;
         }
 
         .mode-card-btn i {
@@ -111,8 +128,15 @@
         }
 
         /* زر العودة للرئيسية الموحد */
+        .back-bar {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            width: 100%;
+            margin-bottom: 25px;
+        }
+
         .back-to-menu-btn {
-            align-self: flex-start;
             background: #202f41;
             color: #fff;
             border: none;
@@ -121,7 +145,6 @@
             font-weight: 700;
             border-radius: 8px;
             cursor: pointer;
-            margin-bottom: 25px;
             transition: all 0.2s;
         }
 
@@ -417,27 +440,48 @@
 
     <div class="app-container">
         
+        <!-- ========================================== -->
+        <!-- شاشة الاختيار الرئيسية الموحدة -->
+        <!-- ========================================== -->
         <div class="main-menu-view" id="main-menu-screen">
             <div class="menu-title-area">
                 <h1 style="font-size: 2.5rem; font-weight: 900; margin-bottom: 10px; color: var(--primary-yellow);">تحدي تخمين اللاعبين الأسطوري</h1>
-                <p style="color: var(--text-muted); font-size: 1.1rem;">اختر طور اللعب المناسب لتبدأ الإثارة فورا</p>
+                <p style="color: var(--text-muted); font-size: 1.1rem; margin-bottom: 20px;">اختر طور اللعب المناسب لتبدأ الإثارة فورا</p>
             </div>
+
+            <!-- عرض النقاط التراكمية الثابتة والمحفوظة -->
+            <div class="score-badge-global">
+                <i class="fa-solid fa-star"></i>
+                <span>مجموع نقاطك الثابتة (اللعب المنفرد):</span>
+                <span id="global-score-value">0</span>
+            </div>
+
             <div class="menu-mode-buttons">
+                <!-- زر طور لاعب 1 -->
                 <button class="mode-card-btn" onclick="activateGameMode('single')">
                     <i class="fa-solid fa-user"></i>
                     <span>لاعب 1</span>
-                    <p>العب منفرداً ضد النظام التلقائي ومحرك التخمين العشوائي.</p>
+                    <p>العب منفرداً ضد النظام التلقائي واجمع نقاطاً ثابتة ومحفوظة!</p>
                 </button>
+                <!-- زر طور لاعبين -->
                 <button class="mode-card-btn" onclick="activateGameMode('multi')">
                     <i class="fa-solid fa-users"></i>
                     <span>لاعبين</span>
-                    <p>التحدي السري التبادلي الممتع .</p>
+                    <p>التحدي السري التبادلي الممتع.</p>
                 </button>
             </div>
         </div>
 
+        <!-- ========================================== -->
+        <!-- طور اللعب الفردي وجولات العرض العشوائي (لاعب 1) -->
+        <!-- ========================================== -->
         <div id="single-player-container" class="hidden-mode" style="width:100%; display:flex; flex-direction:column;">
-            <button class="back-to-menu-btn" onclick="exitToMainMenu()"><i class="fa-solid fa-home"></i> رئيسية</button>
+            <div class="back-bar">
+                <button class="back-to-menu-btn" onclick="exitToMainMenu()"><i class="fa-solid fa-home"></i> رئيسية</button>
+                <div style="font-weight: bold; color: var(--primary-yellow); font-size: 1.1rem;">
+                    <i class="fa-solid fa-award"></i> النقاط في هذه الجلسة: <span id="single-session-score">0</span>
+                </div>
+            </div>
             
             <div class="game-layout">
                 <div class="controls-panel">
@@ -449,9 +493,10 @@
                     </div>
                     
                     <div class="db-info-text">
-                        <i class="fa-solid fa-circle-info"></i> طور اللاعب الواحد يعرض عليك بطاقة عشوائية وعليك تخمين الاسم فوراً من القائمة الجانبية!
+                        <i class="fa-solid fa-circle-info"></i> طور اللاعب الواحد يعرض عليك بطاقة عشوائية وعليك تخمين الاسم فوراً من القائمة الجانبية! كل تخمين صحيح يمنحك 10 نقاط ثابتة! يمكنك التخطّي مرة واحدة فقط في الجولة.
                     </div>
-                    <button class="btn-random" onclick="generateRandomSingleCard()"><i class="fa-solid fa-shuffle"></i> بطاقة عشوائية أخرى</button>
+                    <button class="btn-random" id="next-card-btn-single" onclick="hasSkippedThisRound = false; generateRandomSingleCard();" style="display:none; background-color:#27ae60;"><i class="fa-solid fa-forward"></i> انتقال للبطاقة التالية</button>
+                    <button class="btn-random" id="shuffle-card-btn-single" onclick="skipSingleCard()"><i class="fa-solid fa-shuffle"></i> تخطي وبطاقة أخرى</button>
                 </div>
 
                 <div class="card-panel">
@@ -472,6 +517,9 @@
             </div>
         </div>
 
+        <!-- ========================================== -->
+        <!-- طور تحدي اللاعبين التبادلي المعتمد (لاعبين) -->
+        <!-- ========================================== -->
         <div id="multi-player-container" class="hidden-mode" style="width:100%; display:flex; flex-direction:column;">
             <button class="back-to-menu-btn" onclick="exitToMainMenu()"><i class="fa-solid fa-home"></i> رئيسية</button>
             
@@ -508,10 +556,10 @@
                             <div class="suggestions-dropdown" id="drop-1"></div>
                         </div>
                         <div class="db-info-text">
-                            <i class="fa-solid fa-circle-info"></i> قاعدة البيانات تحتوي على 200 نجم من النجوم الحاليين، الأساطير، والعرب!
+                            <i class="fa-solid fa-circle-info"></i> قاعدة البيانات تحتوي على نجوم الحاليين، الأساطير، والعرب!
                         </div>
                         <button class="btn-random" onclick="generateRandomCard(1)"><i class="fa-solid fa-shuffle"></i> لاعب عشوائي آخر</button>
-                        <button class="btn-yellow-submit" style="margin-top: 10px;" onclick="goToNextSlide()">حفظت البيانات؟ التالي <i class="fa-solid fa-arrow-left"></i></button>
+                        <button class="btn-yellow-submit" style="margin-top: 10px;" onclick="goToNextSlide()">حفظت البيانات? التالي <i class="fa-solid fa-arrow-left"></i></button>
                     </div>
 
                     <div class="card-panel">
@@ -558,7 +606,7 @@
                             <div>استخدم الصورة والمواصفات المعروضة لتوجيهه بذكاء.</div>
                         </div>
                         <button class="btn-random" onclick="generateRandomCard(2)"><i class="fa-solid fa-shuffle"></i> لاعب عشوائي آخر</button>
-                        <button class="btn-yellow-submit" style="margin-top: 10px;" onclick="goToNextSlide()">حفظت المواصفات؟ التالي <i class="fa-solid fa-arrow-left"></i></button>
+                        <button class="btn-yellow-submit" style="margin-top: 10px;" onclick="goToNextSlide()">حفظت المواصفات? التالي <i class="fa-solid fa-arrow-left"></i></button>
                     </div>
 
                     <div class="card-panel">
@@ -588,121 +636,307 @@
 
             <div class="footer-status" id="mp-footer-bar">
                 <div id="bottom-step">الشريحة 1 من 6</div>
-                <div class="matchup-badge" id="bottom-matchup">###### <span>VS</span> ######</div>
+                <div class="matchup-badge" id="bottom-matchup">#### <span>VS</span> ####</div>
             </div>
         </div>
 
     </div>
 
     <script>
-        // قاعدة البيانات الكاملة المكونة من 200 لاعب حقيقي بمواصفاتهم وصورهم الحقيقية لعام 2026
+        // مصفوفة تحتوي على 200 لاعب حقيقي مستقل بالكامل بدون نظام نسخ
         const masterPlayersList = [
-            // --- أساطير تاريخيين ---
-            { name: "بيلييه", nat: "برازيلي", club: "معتزل (الجوهرة السوداء)", pos: "مهاجم / صانع ألعاب تاريخي", feat: "اللاعب الوحيد في التاريخ الذي توج بـ 3 بطولات كأس عالم وسجل أكثر من 1000 هدف.", img: "https://upload.wikimedia.org/wikipedia/commons/a/a9/Pele_con_brasil.jpg" },
-            { name: "دييغو مارادونا", nat: "أرجنتيني", club: "معتزل (أسطورة القرن)", pos: "صانع ألعاب / جناح أسطوري", feat: "قاد الأرجنتين بمفرده تقريباً للتتويج بكأس العالم 1986 وهدفه الشهير ضد إنجلترا.", img: "https://www.al-watan.com/watanqatar/uploads/images/2022/11/15/43480.jpg" },
-            { name: "ظاهرة رونالدو", nat: "برازيلي", club: "معتزل (الظاهرة R9)", pos: "مهاجم مرعب لا يصد", feat: "المراوغ البرازيلي الأقوى وبطل كأس العالم 2002 وهدافها المرعب ورغم الإصابات صُنّف كأفضل مهاجم.", img: "https://www.aljazeera.net/wp-content/uploads/2021/06/989675190.jpg?resize=1920%2C1440" },
-            { name: "زين الدين زيدان", nat: "فرنسي", club: "معتزل (المايسترو زيزو)", pos: "لاعب وسط هجومي عبقري", feat: "بطل كأس العالم 1998 وصاحب النطحة الشهيرة والهدف الأسطوري الطائر في نهائي دوري الأبطال 2002.", img: "https://assets.realmadrid.com/is/image/realmadrid/1330190795142?$Mobile$&fit=wrap" },
-            { name: "رونالدينيو", nat: "برازيلي", club: "معتزل (ساحر الابتسامة)", pos: "لاعب مهارى حر / جناح", feat: "ملك المتعة الكروية والمراوغات الإبداعية الراقصة الحائز على تصفيق جماهير البيرنابيو.", img: "https://cnn-arabic-images.cnn.io/cloudinary/image/upload/w_1100,c_scale,q_auto/cnnarabic/2017/03/16/images/86956.jpg" },
-            { name: "تيري هنري", nat: "فرنسي", club: "معتزل (الغزال الأسمر)", pos: "مهاجم / جناح أسطوري", feat: "الهداف التاريخي لأرسنال وقائد جيل اللاهزيمة الذهبي التاريخي في البريميرليج.", img: "https://www.emaratalyoum.com/polopoly_fs/1.1482365.1619342785!/image/image.jpeg" },
-            { name: "يوهان كرويف", nat: "هولندي", club: "معتزل (مبتكر الكرة الشاملة)", pos: "صانع ألعاب / مهاجم وهمي", feat: "الأب الروحي لأسلوب لعب برشلونة وأسطورة هولندا في السبعينات وصاحب الـ 3 كرات ذهبية.", img: "https://cdn.al-ain.com/images/2020/4/25/100-173343-johan-cruyff-history-football_700x400.jpg" },
-            { name: "ميشيل بلاتيني", nat: "فرنسي", club: "معتزل", pos: "لاعب وسط هجومي", feat: "فاز بالكرة الذهبية 3 مرات متتالية في الثمانينات وهداف أمم أوروبا الأسطوري التاريخي.", img: "https://a.espncdn.com/i/headshots/soccer/players/full/231747.png" },
-            { name: "باولو مالديني", nat: "إيطالي", club: "معتزل (القلب النابض للميلان)", pos: "مدافع أيسر / قلب دفاع أسطوري", feat: "قضى مسيرته كاملة في ميلان وفاز بـ 5 ألقاب دوري أبطال أوروبا ويعتبر المدافع الأفضل في التاريخ.", img: "https://a.espncdn.com/i/headshots/soccer/players/full/217277.png" },
-            { name: "فرانز بيكنباور", nat: "ألماني", club: "معتزل (القيصر)", pos: "مدافع قشاش (ليبرو) تاريخي", feat: "مبتكر مركز الليبرو العصري وفاز بكأس العالم كلاعب وكمدرب مع الماكينات الألمانية.", img: "https://a.espncdn.com/i/headshots/soccer/players/full/285025.png" },
-            { name: "روبيرتو كارلوس", nat: "برازيلي", club: "معتزل", pos: "ظهير أيسر طائر", feat: "صاحب أقوى تسديدات يسارية مرعبة وصاحب الركلة الحرة الفيزيائية الشهيرة ضد فرنسا.", img: "https://a.espncdn.com/i/headshots/desktop/players/20155.png" },
-            { name: "أندريا بيرلو", nat: "إيطالي", club: "معتزل (المهندس الرسام)", pos: "لاعب وسط متأخر (مايسترو)", feat: "يمتاز ببرود أعصابه القاتل وركلاته الحرة وتمريراته الطويلة المليمترية خلف المدافعين.", img: "https://a.espncdn.com/i/headshots/soccer/players/full/217277.png" },
-            { name: "تشافي هيرنانديز", nat: "إسباني", club: "معتزل (كمبيوتر الوسط)", pos: "لاعب وسط ضابط للإيقاع", feat: "عقل التيكي تاكا المدمر في برشلونة وإسبانيا وبطل كأس العالم 2010 واليورو مرتين.", img: "https://a.espncdn.com/i/headshots/soccer/players/full/304192.png" },
-            { name: "أندريس إنييستا", nat: "إسباني", club: "معتزل (الرسام الأسطوري)", pos: "لاعب وسط مهارى مخترق", feat: "صاحب أغلى هدف في تاريخ إسبانيا بنهائي كأس العالم 2010 وصاحب اللمسات السحرية.", img: "https://a.espncdn.com/i/headshots/soccer/players/full/271173.png" },
-            { name: "ديفيد بيكهام", nat: "إنجليزي", club: "معتزل (ملك العرضيات)", pos: "جناح أيمن / لاعب وسط", feat: "اشتهر بتمريراته العرضية القاتلة وركلاته الحرة المقوسة وبمسيرته مع مانشستر يونايتد والريال.", img: "https://a.espncdn.com/i/headshots/soccer/players/full/275331.png" },
-            { name: "كاكا", nat: "برازيلي", club: "معتزل (أمير برلين)", pos: "لاعب وسط هجومي / صانع ألعاب", feat: "آخر من فاز بالبالون دور قبل هيمنة ميسي ورونالدو بعد مسيرة تاريخية مرعبة مع ميلان 2007.", img: "https://a.espncdn.com/i/headshots/desktop/players/20155.png" },
-            { name: "زلاتان إبراهيموفيتش", nat: "سويدي", club: "معتزل (السلطان الأسطوري)", pos: "مهاجم صريح عملاق", feat: "صاحب الأهداف الأكروباتية المستحيلة وأحرز ألقاباً في كل دوري لعب به بفضل قوة التايكوندو.", img: "https://a.espncdn.com/i/headshots/soccer/players/full/210515.png" },
-            { name: "روبيرتو باجيو", nat: "إيطالي", club: "معتزل (ذيل الحصان الإلهي)", pos: "صانع ألعاب / مهاجم متأخر", feat: "صاحب مهارة عبقرية أضاع ركلة الترجيح الشهيرة في نهائي مونديال 1994 لكنه يظل رمزاً للمتعة المتكاملة.", img: "https://a.espncdn.com/i/headshots/soccer/players/full/217277.png" },
-            { name: "أوليفير كان", nat: "ألماني", club: "معتزل (البركان العمودي)", pos: "حارس مرمى مرعب", feat: "الحارس الوحيد في التاريخ الحائز على جائزة أفضل لاعب في بطولة كأس العالم (مونديال 2002).", img: "https://a.espncdn.com/i/headshots/soccer/players/full/285025.png" },
-            { name: "إيكر كاسياس", nat: "إسباني", club: "معتزل (القديس)", pos: "حارس مرمى أسطوري", feat: "قائد العصر الذهبي لريال مدريد وإسبانيا وفاز بكل شيء ممكن في عالم المستديرة.", img: "https://a.espncdn.com/i/headshots/soccer/players/full/304192.png" },
-
-            // --- جيل الأساطير الحالي والهيمنة الحديثة ---
-            { name: "كريستيانو رونالدو", nat: "برتغالي", club: "النصر السعودي", pos: "مهاجم هداف (صاروخ ماديرا)", feat: "الهداف التاريخي لكرة القدم وللمنتخبات وصاحب الـ 5 كرات ذهبية والخمسة دوري أبطال.", img: "https://resources.saudi-pro-league.pulselive.com/photo-resources/2024/08/25/3dae01f1-b49f-48a0-8611-68dec43c8598/GettyImages-2167147749.jpg?width=1868&height=1136" },
-            { name: "ليونيل ميسي", nat: "أرجنتيني", club: "إنتر ميامي الأمريكي", pos: "جناح / صانع ألعاب أسطوري", feat: "الأكثر تتويجاً بالكرات الذهبية (8) وبطل العالم التاريخي 2022 واللاعب الأكثر حصداً للبطولات تاريخياً.", img: "https://a.espncdn.com/i/headshots/soccer/players/full/45889.png" },
-            { name: "محمد صلاح", nat: "مصري", club: "ليفربول الإنجليزي", pos: "جناح أيمن هداف سرييع", feat: "الملك المصري وحطم كل الأرقام القياسية التاريخية لنادي ليفربول في البريميرليج وأوروبا.", img: "https://www.emaratalyoum.com/polopoly_fs/1.2034687.1775937069!/image/image.jpg" },
-            { name: "كيليان مبابي", nat: "فرنسي", club: "ريال مدريد الإسباني", pos: "مهاجم سريع خارق", feat: "بطل العالم 2018 وهداف باريس التاريخي وانتقل للملكي بصفقة مدوية هزت العالم.", img: "https://a.espncdn.com/i/headshots/soccer/players/full/231747.png" },
-            { name: "إيرلينج هالاند", nat: "نرويجي", club: "مانشستر سيتي الإنجليزي", pos: "مهاجم صريح غول مدمر", feat: "ماكينة أهداف بشرية حطم الرقم القياسي للأهداف بموسم واحد بالبريميرليج وتوج بالثلاثية التاريخية.", img: "https://a.espncdn.com/i/headshots/soccer/players/full/249842.png" },
-            { name: "جود بيلينجهام", nat: "إنجليزي", club: "ريال مدريد الإسباني", pos: "لاعب وسط هجومي متكامل", feat: "فاز بجائزة الفتى الذهبي ويمتاز باحتفاليته الشهيرة بفتح ذراعيه أمام الجماهير وقاد الريال لأبطال أوروبا.", img: "https://a.espncdn.com/i/headshots/soccer/players/full/275331.png" },
-            { name: "فينيسيوس جونيور", nat: "برازيلي", club: "ريال مدريد الإسباني", pos: "جناح أيسر مهارى سريع", feat: "نجم المواعيد الكبرى المرعب وصاحب أهداف حسم نهائيات دوري أبطال أوروبا للملكي.", img: "https://a.espncdn.com/i/headshots/soccer/players/full/238194.png" },
-            { name: "لامين يامال", nat: "إسباني", club: "برشلونة الإسباني", pos: "جناح أيمن معجزة صاعد", feat: "أصغر لاعب يسجل ويصنع ويتوج في تاريخ بطولات أمم أوروبا (يورو 2024).", img: "https://a.espncdn.com/i/headshots/soccer/players/full/304192.png" },
-            { name: "كيفين دي بروين", nat: "بلجيكي", club: "مانشستر سيتي الإنجليزي", pos: "صانع ألعاب عبقري ساحر", feat: "ملك الأسيستات والتمريرات الحاسمة الخارقة للعادة ورؤية الملعب الهندسية.", img: "https://a.espncdn.com/i/headshots/soccer/players/full/139867.png" },
-            { name: "لوكا مودريتش", nat: "كرواتي", club: "ريال مدريد الإسباني", pos: "مايسترو وسط الميدان الخالد", feat: "قائد كرواتيا التاريخي وحاصل على بالون دور 2018 ومهندس ريتم خط وسط النادي الملكي.", img: "https://a.espncdn.com/i/headshots/soccer/players/full/96740.png" },
-            { name: "كريم بنزيما", nat: "فرنسي", club: "الاتحاد السعودي", pos: "مهاجم هداف وقائد تكتيكي", feat: "صاحب الكرة الذهبية التاريخية لعام 2022 بعد موسم إعجازي خارق مع ريال مدريد.", img: "https://a.espncdn.com/i/headshots/soccer/players/full/46858.png" },
-            { name: "روبرت ليفاندوفسكي", nat: "بولندي", club: "برشلونة الإسباني", pos: "قناص الصندوق الكلاسيكي", feat: "الحذاء الذهبي الأوروبي وهداف بايرن السابق التاريخي وصاحب خماسية في 9 دقائق الشهيرة.", img: "https://a.espncdn.com/i/headshots/soccer/players/full/128367.png" },
-            { name: "هاري كين", nat: "إنجليزي", club: "بايرن ميونخ الألماني", pos: "مهاجم هداف / صانع ألعاب", feat: "الهداف التاريخي لمنتخب إنجلترا وتوتنهام وماكينة أهداف لا تتوقف في البوندسليغا.", img: "https://a.espncdn.com/i/headshots/soccer/players/full/159428.png" },
-            { name: "توني كروس", nat: "ألماني", club: "معتزل (المهندس الألماني)", pos: "لاعب وسط / ممرر ميكرومتري", feat: "اعتزل وهو في قمة مجده بعد التتويج بدوري الأبطال السادسة ويورو 2024 بنسبة تمرير 99%.", img: "https://a.espncdn.com/i/headshots/soccer/players/full/96740.png" },
-            { name: "نيمار جونيور", nat: "برازيلي", club: "الهلال السعودي", pos: "ساحر مهارى / صانع ألعاب ممتع", feat: "الهداف التاريخي لمنتخب السامبا متخطياً الأسطورة بيليه وبطل الثلاثية مع البرسا.", img: "https://a.espncdn.com/i/headshots/soccer/players/full/139331.png" },
-
-            // --- نجوم العرب والشرق الأوسط ---
-            { name: "رياض محرز", nat: "جزائري", club: "الأهلي السعودي", pos: "جناح أيمن ساحر (كنترول قاتل)", feat: "بطل البريميرليج التاريخي مع ليستر سيتي ومانشستر سيتي وبطل أفريقيا 2019.", img: "https://a.espncdn.com/i/headshots/soccer/players/full/177457.png" },
-            { name: "ياسين بونو", nat: "مغربي", club: "الهلال السعودي", pos: "حارس مرمى عملاق سد منيع", feat: "حامي عرين أسود الأطلس برابع العالم وهداف التصديات الأسطورية في ركلات الترجيح.", img: "https://a.espncdn.com/i/headshots/soccer/players/full/161421.png" },
-            { name: "أشرف حكيمي", nat: "مغربي", club: "باريس سان جيرمان الفرنسي", pos: "ظهير أيمن نفاثة سريع", feat: "من أفضل أظهرة العالم اليمنى وقائد مغربي حصد بطولات مع الريال وإنتر والباريس.", img: "https://a.espncdn.com/i/headshots/soccer/players/full/226168.png" },
-            { name: "حكيم زياش", nat: "مغربي", club: "غلطة سراي التركي", pos: "جناح / صانع ألعاب (العازف)", feat: "يمتاز بتمريراته المقوسة الساحرة ورجل اليسرى السامة وقاد أياكس والمغرب لنصف نهائي المونديال.", img: "https://a.espncdn.com/i/headshots/soccer/players/full/171542.png" },
-            { name: "salam", nat: "سعودي", club: "الهلال السعودي", pos: "جناح أيسر مهارى (التورنيدو)", feat: "أفضل لاعب في آسيا وصاحب الهدف التاريخي الأسطوري ضد الأرجنتين في مونديال قطر 2022.", img: "https://a.espncdn.com/i/headshots/soccer/players/full/170068.png" },
-            { name: "عمر السومة", nat: "سوري", club: "العربي القطري", pos: "مهاجم هداف تاريخي الكلاسيكي", feat: "الهداف التاريخي للدوري السعودي للمحترفين بمسيرته الإعجازية مع أهلي جدة.", img: "https://a.espncdn.com/i/headshots/soccer/players/full/173896.png" },
-            { name: "بغداد بونجاح", nat: "جزائري", club: "الشمال القطري", pos: "مهاجم قناص شرس", feat: "الهداف الأسطوري لنادي السد القطري وصاحب هدف تتويج الجزائر بكأس أمم أفريقيا 2019.", img: "https://a.espncdn.com/i/headshots/soccer/players/full/177457.png" },
-            { name: "إسماعيل مطر", nat: "إماراتي", club: "معتزل (سمعة الأسطورة)", pos: "صانع ألعاب / مهاجم تاريخي", feat: "قائد العصر الذهبي الأبيض الإماراتي وبطل كأس الخليج التاريخية 18 وهدافها الأسطوري.", img: "https://a.espncdn.com/i/headshots/soccer/players/full/170068.png" },
-            { name: "علي مبخوت", nat: "إماراتي", club: "النصر الإماراتي", pos: "مهاجم قناص تاريخي", feat: "الهداف التاريخي لمنتخب الإمارات والدوري الإماراتي ومن أبرز هدافي المنتخبات عالمياً.", img: "https://a.espncdn.com/i/headshots/soccer/players/full/140662.png" },
-            { name: "يوسف النصيري", nat: "مغربي", club: "فنربخشة التركي", pos: "مهاجم صندوق وارتقاء هوائي", feat: "صاحب القفزة الإعجازية الشهيرة ضد البرتغال التي أهلت المغرب لنصف نهائي المونديال.", img: "https://a.espncdn.com/i/headshots/soccer/players/full/161421.png" }
+            { name: "محمد أبو تريكة", nat: "مصري", club: "معتزل (الماجيكو)", pos: "صانع ألعاب أسطوري", feat: "أسطورة الأهلي ومنتخب مصر، حصد أمم أفريقيا مرتين وبرونزية مونديال الأندية.", img: "https://www.egyptianhonorslist.com/images/sport/treka.jpg" },
+            { name: "بيلييه", nat: "برازيلي", club: "معتزل (الجوهرة السوداء)", pos: "مهاجم تاريخي", feat: "اللاعب الوحيد في التاريخ المتوج بـ 3 بطولات كأس عالم وسجل أكثر من 1000 هدف.", img: "https://upload.wikimedia.org/wikipedia/commons/a/a9/Pele_con_brasil.jpg" },
+            { name: "دييغو مارادونا", nat: "أرجنتيني", club: "معتزل", pos: "صانع ألعاب أسطوري", feat: "قاد الأرجنتين بمفرده تقريباً للتتويج بكأس العالم 1986 وهدفه الشهير باليد وضد إنجلترا.", img: "https://www.al-watan.com/watanqatar/uploads/images/2022/11/15/43480.jpg" },
+            { name: "ظاهرة رونالدو", nat: "برازيلي", club: "معتزل (R9)", pos: "مهاجم مرعب", feat: "المراوغ البرازيلي الأقوى وبطل كأس العالم 2002 وهدافها الخارق رغم إصابات الركبة.", img: "https://www.aljazeera.net/wp-content/uploads/2021/06/989675190.jpg?resize=1920%2C1440" },
+            { name: "زين الدين زيدان", nat: "فرنسي", club: "معتزل (زيزو)", pos: "لاعب وسط عبقري", feat: "بطل كأس العالم 1998 وصاحب الهدف الطائر الأسطوري في نهائي دوري الأبطال 2002 ضد ليفركوزن.", img: "https://assets.realmadrid.com/is/image/realmadrid/1330190795142?$Mobile$&fit=wrap" },
+            { name: "رونالدينيو", nat: "برازيلي", club: "معتزل", pos: "جناح / ساحر مهارى", feat: "ملك المتعة الكروية والمراوغات الإبداعية الراقصة الحائز على بالون دور وتصفيق البيرنابيو.", img: "https://cnn-arabic-images.cnn.io/cloudinary/image/upload/w_1100,c_scale,q_auto/cnnarabic/2017/03/16/images/86956.jpg" },
+            { name: "تيري هنري", nat: "فرنسي", club: "معتزل (الغزال الأسمر)", pos: "مهاجم أسطوري", feat: "الهداف التاريخي لنادي أرسنال وقائد جيل اللاهزيمة الذهبي في البريميرليج.", img: "https://www.emaratalyoum.com/polopoly_fs/1.1482365.1619342785!/image/image.jpeg" },
+            { name: "يوهان كرويف", nat: "هولندي", club: "معتزل", pos: "صانع ألعاب / مهاجم وهمي", feat: "الأب الروحي لأسلوب الكرة الشاملة ولعب برشلونة، فاز بـ 3 كرات ذهبية.", img: "https://cdn.al-ain.com/images/2020/4/25/100-173343-johan-cruyff-history-football_700x400.jpg" },
+            { name: "باولو مالديني", nat: "إيطالي", club: "معتزل", pos: "مدافع أسطوري", feat: "قضى مسيرته كاملة في ميلان (25 سنة) وفاز بـ 5 ألقاب دوري أبطال أوروبا.", img: "https://assets.goal.com/images/v3/blt433637ec75be940e/747f99f25561cb42dceff0c5e292dedb1900b610.jpg?auto=webp&format=pjpg&width=3840&quality=60" },
+            { name: "فرانز بيكنباور", nat: "ألماني", club: "معتزل (القيصر)", pos: "مدافع قشاش (ليبرو)", feat: "مبتكر مركز الليبرو العصري وفاز بكأس العالم كلاعب وكمدرب مع ألمانيا.", img: "https://www.mediastorehouse.com.au/p/210/franz-beckenbauer-ball-final-euro-72-3463905.jpg.webp" },
+            { name: "روبيرتو كارلوس", nat: "برازيلي", club: "معتزل", pos: "ظهير أيسر طائر", feat: "صاحب أقوى تسديدات يسارية مرعبة وصاحب الركلة الحرة المقوسة الخارقة ضد فرنسا.", img: "https://www.aljazeera.net/wp-content/uploads/2005/10/0d089fe2-7ef0-4cbb-9a2e-519dafb651c6.jpeg?resize=770%2C513&quality=80" },
+            { name: "أندريس إنييستا", nat: "إسباني", club: "معتزل (الرسام)", pos: "لاعب وسط مهارى", feat: "صاحب أغلى هدف في تاريخ إسبانيا في نهائي كأس العالم 2010 ضد هولندا.", img: "https://www.aljazeera.net/wp-content/uploads/2024/12/doc-36qe8tt-1734266040.jpg?resize=1800%2C1800" },
+            { name: "ديفيد بيكهام", nat: "إنجليزي", club: "معتزل", pos: "جناح أيمن / ملك العرضيات", feat: "اشتهر بتمريراته المقوسة القاتلة وركلاته الحرة بمسيرته مع مانشستر والريال.", img: "https://arabic.sport360.com/wp-content/uploads/2016/10/david-beckham-manchester-united.jpg" },
+            { name: "كاكا", nat: "برازيلي", club: "معتزل", pos: "لاعب وسط هجومي", feat: "آخر من فاز بالبالون دور قبل هيمنة ميسي ورونالدو بعد مسيرة تاريخية مع ميلان 2007.", img: "https://kaka-ar.com/storage/2024/08/%D9%83%D8%A7%D9%83%D8%A7.png" },
+            { name: "زلاتان إبراهيموفيتش", nat: "سويدي", club: "معتزل (السلطان)", pos: "مهاجم صريح عملاق", feat: "صاحب الأهداف الأكروباتية الطائرة المستحيلة ومسيرة حافلة بالألقاب في أوروبا.", img: "https://www.emaratalyoum.com/polopoly_fs/1.1808257.1702308500!/image/image.jpg" },
+            { name: "كريستيانو رونالدو", nat: "برتغالي", club: "النصر السعودي", pos: "مهاجم هداف (CR7)", feat: "الهداف التاريخي لكرة القدم وللمنتخبات وصاحب الـ 5 كرات ذهبية و5 دوري أبطال.", img: "https://a.espncdn.com/i/headshots/soccer/players/full/22774.png" },
+            { name: "ليونيل ميسي", nat: "أرجنتيني", club: "إنتر ميامي الأمريكي", pos: "جناح / صانع ألعاب أسطوري", feat: "الأكثر تتويجاً بالكرات الذهبية (8) وبطل العالم التاريخي في مونديال قطر 2022.", img: "https://a.espncdn.com/i/headshots/soccer/players/full/45889.png" },
+            { name: "محمد صلاح", nat: "مصري", club: "ليفربول الإنجليزي", pos: "جناح أيمن هداف", feat: "الملك المصري وحطم الرقم القياسي التاريخي لهدافي ليفربول في البريميرليج.", img: "https://a.espncdn.com/i/headshots/soccer/players/full/173896.png" },
+            { name: "كيليان مبابي", nat: "فرنسي", club: "ريال مدريد الإسباني", pos: "مهاجم سريع خارق", feat: "بطل العالم 2018 وهداف باريس التاريخي وانتقل للملكي بصفقة حرة مدوية.", img: "https://a.espncdn.com/i/headshots/soccer/players/full/231747.png" },
+            { name: "إيرلينج هالاند", nat: "نرويجي", club: "مانشستر سيتي الإنجليزي", pos: "مهاجم صريح مدمر", feat: "ماكينة أهداف بشرية حطم الرقم القياسي للأهداف بموسم واحد بالبريميرليج (36 هدف).", img: "https://a.espncdn.com/i/headshots/soccer/players/full/249842.png" },
+            { name: "جود بيلينجهام", nat: "إنجليزي", club: "ريال مدريد الإسباني", pos: "لاعب وسط هجومي", feat: "صاحب الاحتفالية الشهيرة بفتح ذراعيه أمام الجماهير وقاد الريال لثنائية الأبطال والليغا.", img: "https://a.espncdn.com/i/headshots/soccer/players/full/275331.png" },
+            { name: "فينيسيوس جونيور", nat: "برازيلي", club: "ريال مدريد الإسباني", pos: "جناح أيسر سريع", feat: "نجم المواعيد الكبرى وصاحب أهداف حسم نهائيات دوري أبطال أوروبا للملكي.", img: "https://a.espncdn.com/i/headshots/soccer/players/full/238194.png" },
+            { name: "لامين يامال", nat: "إسباني", club: "برشلونة الإسباني", pos: "جناح أيمن معجزة", feat: "أصغر لاعب يسجل ويصنع ويتوج في تاريخ بطولات أمم أوروبا بيورو 2024 بعمر 17 سنة.", img: "https://a.espncdn.com/i/headshots/soccer/players/full/304192.png" },
+            { name: "كيفين دي بروين", nat: "بلجيكي", club: "مانشستر سيتي الإنجليزي", pos: "صانع ألعاب عبقري", feat: "ملك الأسيستات والتمريرات الحاسمة الخارقة ورؤية الملعب الهندسية الساحرة.", img: "https://a.espncdn.com/i/headshots/soccer/players/full/139867.png" },
+            { name: "لوكا مودريتش", nat: "كرواتي", club: "ريال مدريد الإسباني", pos: "مايسترو خط الوسط", feat: "قائد كرواتيا التاريخي وحاصل على بالون دور 2018 بعد كسر هيمنة ميسي ورونالدو.", img: "https://a.espncdn.com/i/headshots/soccer/players/full/96740.png" },
+            { name: "كريم بنزيما", nat: "فرنسي", club: "الاتحاد السعودي", pos: "مهاجم هداف تكتيكي", feat: "صاحب الكرة الذهبية لعام 2022 بعد موسم ريمونتادات إعجازي مع ريال مدريد.", img: "https://a.espncdn.com/i/headshots/soccer/players/full/46858.png" },
+            { name: "روبرت ليفاندوفسكي", nat: "بولندي", club: "برشلونة الإسباني", pos: "قناص الصندوق", feat: "الحذاء الذهبي الأوروبي وهداف بايرن السابق، وصاحب خماسية الـ 9 دقائق الشهيرة.", img: "https://a.espncdn.com/i/headshots/soccer/players/full/128367.png" },
+            { name: "نيمار جونيور", nat: "برازيلي", club: "الهلال السعودي", pos: "ساحر مهارى ممتع", feat: "الهداف التاريخي لمنتخب السامبا متخطياً بيليه وبطل الثلاثية التاريخية مع البرسا.", img: "https://a.espncdn.com/i/headshots/soccer/players/full/139331.png" },
+            { name: "رياض محرز", nat: "جزائري", club: "الأهلي السعودي", pos: "جناح أيمن مهارى", feat: "بطل البريميرليج التاريخي الإعجازي مع ليستر سيتي ومع مانشستر سيتي وبطل أفريقيا 2019.", img: "https://a.espncdn.com/i/headshots/soccer/players/full/177457.png" },
+            { name: "ياسين بونو", nat: "مغربي", club: "الهلال السعودي", pos: "حارس مرمى عملاق", feat: "حامي عرين أسود الأطلس برابع العالم ومبدع ركلات الترجيح والقفازات الحاسمة.", img: "https://a.espncdn.com/i/headshots/soccer/players/full/161421.png" },
+            { name: "أشرف حكيمي", nat: "مغربي", club: "باريس سان جيرمان", pos: "ظهير أيمن نفاثة", feat: "من أفضل أظهرة العالم اليمنى وحصد بطولات مع الريال وإنتر والبي اس جي.", img: "https://a.espncdn.com/i/headshots/soccer/players/full/226168.png" },
+            { name: "سالم الدوسري", nat: "سعودي", club: "الهلال السعودي", pos: "جناح أيسر (التورنيدو)", feat: "أفضل لاعب في آسيا وصاحب الهدف التاريخي العالمي ضد الأرجنتين بمونديال 2022.", img: "https://a.espncdn.com/i/headshots/soccer/players/full/170068.png" },
+            { name: "علي مبخوت", nat: "إماراتي", club: "النصر الإماراتي", pos: "مهاجم قناص تاريخي", feat: "الهداف التاريخي لمنتخب الإمارات والدوري الإماراتي ومن أبرز هدافي العالم دولياً.", img: "https://a.espncdn.com/i/headshots/soccer/players/full/140662.png" },
+            { name: "أنطوان غريزمان", nat: "فرنسي", club: "أتلتيكو مدريد", pos: "مهاجم وهمي ذكي", feat: "بطل العالم 2018 والعقل المدبر لخطط دييغو سيميوني في الهجوم والدفاع.", img: "https://a.espncdn.com/i/headshots/soccer/players/full/173896.png" },
+            { name: "برناردو سيلفا", nat: "برتغالي", club: "مانشستر سيتي", pos: "لاعب وسط زئبقي", feat: "رجل المهام الصعبة لغوارديولا ويمتاز بالتحكم الخرافي بالكرة والضغط العالي.", img: "https://a.espncdn.com/i/headshots/soccer/players/full/139867.png" },
+            { name: "رودري", nat: "إسباني", club: "مانشستر سيتي", pos: "لاعب ارتكاز دفاعي", feat: "رجل التوازن والنهائيات الحاسم وبطل أمم أوروبا ويورو 2024 وحائز البالون دور.", img: "https://a.espncdn.com/i/headshots/soccer/players/full/249842.png" },
+            { name: "فالفيردي", nat: "أوروغوياني", club: "ريال مدريد الإسباني", pos: "لاعب وسط بوكس تو بوكس", feat: "صاحب التسديدات الصاروخية العابرة للقارات والركض اللانهائي والقميص رقم 8 بعد كروس.", img: "https://a.espncdn.com/i/headshots/soccer/players/full/275331.png" },
+            { name: "برونو فيرنانديز", nat: "برتغالي", club: "مانشستر يونايتد", pos: "صانع ألعاب / قائد", feat: "محرك اليونايتد الأساسي والمسؤول عن كل الكرات الثابتة والتمريرات القاتلة.", img: "https://a.espncdn.com/i/headshots/soccer/players/full/22774.png" },
+            { name: "أليسون بيكر", nat: "برازيلي", club: "ليفربول الإنجليزي", pos: "حارس مرمى جدار", feat: "حارس ليفربول المنقذ وصاحب الرأسية الشهيرة بالدقيقة الأخيرة التي أهلت الفريق سابقاً.", img: "https://a.espncdn.com/i/headshots/soccer/players/full/173896.png" },
+            { name: "تيبو كورتوا", nat: "بلجيكي", club: "ريال مدريد الإسباني", pos: "حارس مرمى عملاق", feat: "رجل نهائي أبطال أوروبا 2022 بتصديات إعجازية خلدت في التاريخ أمام ليفربول.", img: "https://a.espncdn.com/i/headshots/soccer/players/full/96740.png" },
+            { name: "روبن دياز", nat: "برتغالي", club: "مانشستر سيتي", pos: "قلب دفاع صخرة", feat: "قائد الخط الخلفي الحاصل على جائزة أفضل لاعب في البريميرليج فور وصوله للسيتي.", img: "https://a.espncdn.com/i/headshots/soccer/players/full/22774.png" },
+            { name: "أنطونيو روديجر", nat: "ألماني", club: "ريال مدريد الإسباني", pos: "قلب دفاع مقاتل", feat: "يمتاز بصلابته البدنية وطريقته القتالية المضحكة والمرعبة في مراقبة المهاجمين.", img: "https://a.espncdn.com/i/headshots/soccer/players/full/285025.png" },
+            { name: "بوكايو ساكا", nat: "إنجليزي", club: "أرسنال الإنجليزي", pos: "جناح أيمن سريع", feat: "نجم الجيل اللندني الجديد والفتى المدلل والقلب النابض لنادي للمدفعجية.", img: "https://a.espncdn.com/i/headshots/soccer/players/full/275331.png" },
+            { name: "مارتن أوديغارد", nat: "نرويجي", club: "أرسنال الإنجليزي", pos: "صانع ألعاب / قائد", feat: "مهندس الهجمات اللندنية وصاحب الرؤية العبقرية والتمريرات البينية السحرية الزاحفة.", img: "https://a.espncdn.com/i/headshots/soccer/players/full/249842.png" },
+            { name: "رافينها", nat: "برازيلي", club: "برشلونة الإسباني", pos: "جناح مهارى سريع", feat: "يمتاز بالعمل الدفاعي القوي والعرضيات المتقنة والجرأة الهجومية الشرسة مع البرسا.", img: "https://a.espncdn.com/i/headshots/soccer/players/full/238194.png" },
+            { name: "بيدري", nat: "إسباني", club: "برشلونة الإسباني", pos: "لاعب وسط عبقري", feat: "الخليفة الشرعي لأسطورة إنييستا والفتى الذهبي الحائز على بطولة اليورو الشابة.", img: "https://a.espncdn.com/i/headshots/soccer/players/full/304192.png" },
+            { name: "غافي", nat: "إسباني", club: "برشلونة الإسباني", pos: "لاعب وسط مقاتل", feat: "يلعب بروح قتالية عالية جداً وبقلب أسد لا يهاب التدخلات العنيفة رغم صغر سنه.", img: "https://a.espncdn.com/i/headshots/soccer/players/full/304192.png" },
+            { name: "إدواردو كامافينغا", nat: "فرنسي", club: "ريال مدريد الإسباني", pos: "لاعب جوكر بالوسط", feat: "يلعب كارتكاز، ظهير أيسر، أو وسط هجومي بنجاح وإتقان إعجازي مذهل في مدريد.", img: "https://a.espncdn.com/i/headshots/soccer/players/full/231747.png" },
+            { name: "مروان عطية", nat: "مصري", club: "الأهلي المصري", pos: "لاعب ارتكاز دفاعي", feat: "مسمار خط الوسط الحاصل على دوري أبطال أفريقيا بفضل قوة قطع الكرات المستمر.", img: "https://a.espncdn.com/i/headshots/soccer/players/full/124230.png" },
+            { name: "حسين الشحات", nat: "مصري", club: "الأهلي المصري", pos: "جناح مهارى", feat: "صاحب الأرقام القياسية والمراوغات والإنجازات الشهيرة في بطولة مونديال الأندية.", img: "https://a.espncdn.com/i/headshots/soccer/players/full/124230.png" },
+            { name: "أحمد سيد زيزو", nat: "مصري", club: "الزمالك المصري", pos: "جناح أيمن طائر", feat: "نجم نادي الزمالك الأبرز والمسؤول الأول عن العرضيات وركلات الجزاء الحاضرة والقاتلة.", img: "https://a.espncdn.com/i/headshots/soccer/players/full/124230.png" }
         ];
 
-        const extraNames = [
-            {n:"أنطوان غريزمان", nat:"فرنسي", c:"أتلتيكو مدريد", p:"مهاجم وهمي / وسط", f:"بطل العالم 2018 والعقل المدبر لخطط أتلتيكو مدريد."},
-            {n:"برناردو سيلفا", nat:"برتغالي", c:"مانشستر سيتي", p:"لاعب وسط مهارى زئبقي", f:"رجل المهام الصعبة لغوارديولا ويمتاز بالتحكم الخرافي بالكرة."},
-            {n:"رودري", nat:"إسباني", c:"مانشستر سيتي", p:"لاعب ارتكاز دفاعي عالمي", f:"رجل التوازن والنهائيات الحاسم وبطل أمم أوروبا ويورو 2024."},
-            {n:"فالفيردي", nat:"أوروغوياني", c:"ريال مدريد", p:"لاعب وسط بوكس تو بوكس نفاثة", f:"صاحب التسديدات الصاروخية العابرة للقارات والركض اللانهائي في مدريد."},
-            {n:"رافا سيلفا", nat:"برتغالي", c:"بنفيكا", p:"جناح سريع جداً", f:"يمتاز بكسر الخطوط الدفاعية بسرعته المذهلة في المرتدات."},
-            {n:"برونو فيرنانديز", nat:"برتغالي", c:"مانشستر يونايتد", p:"صانع ألعاب / قائد", f:"محرك اليونايتد الأساسي والمسؤول عن كل الكرات الثابتة والأسيستات القاتلة."},
-            {n:"أليسون بيكر", nat:"برازيلي", c:"ليفربول الإنجليزي", p:"حارس مرمى أسطوري", f:"حارس ليفربول المنقذ وصاحب الرأسية الشهيرة التي أهلت الفريق للأبطال سابقاً."},
-            {n:"تيبو كورتوا", nat:"بلجيكي", c:"ريال مدريد الإسباني", p:"حارس مرمى عملاق", f:"رجل نهائي أبطال أوروبا 2022 بتصديات إعجازية خلدت في التاريخ أمام ليفربول."},
-            {n:"روبن دياز", nat:"برتغالي", c:"مانشستر سيتي الإنجليزي", p:"قلب دفاع صخرة", f:"قائد الخط الخلفي الحاصل على جائزة أفضل لاعب في البريميرليج فور وصوله."},
-            {n:"أنطونيو روديجر", nat:"ألماني", c:"ريال مدريد الإسباني", p:"قلب دفاع شرس ومقاتل", f:"يمتاز بصلابته البدنية وطريقته المجنونة والمضحكة في حراسة ومراقبة المهاجمين."},
-            {n:"ماركوس راشفورد", nat:"إنجليزي", c:"مانشستر يونايتد", p:"جناح أيسر هداف سريع", f:"ابن النادي الذهبي وصاحب الانطلاقات الصاروخية من الجناح الأيسر."},
-            {n:"بوكايو ساكا", nat:"إنجليزي", c:"أرسنال الإنجليزي", p:"جناح أيمن مهاري ذكي", f:"نجم الجيل اللندني الجديد والفتى المدلل للمدفعجية وأرسنال."},
-            {n:"مارتن أوديغارد", nat:"نرويجي", c:"أرسنال الإنجليزي", p:"صانع ألعاب / قائد الفريق", f:"مهندس الهجمات وصاحب الرؤية العبقرية والتمريرات البينية السحرية الزاحفة."},
-            {n:"فيران توريس", nat:"إسباني", c:"برشلونة الإسباني", p:"مهاجم / جناح", f:"الملقب بالقرش ويمتاز بالتحكات الذكية خلف المدافعين."},
-            {n:"رافينها", nat:"برازيلي", c:"برشلونة الإسباني", p:"جناح مهارى ومقاتل", f:"يمتاز بالعمل الدفاعي القوي والعرضيات المتقنة والجرأة الهجومية الشرسة."},
-            {n:"بيدري", nat:"إسباني", c:"برشلونة الإسباني", p:"لاعب وسط عبقري صاعد", f:"الخليفة الشرعي لإنييستا والفتى الذهبي الحائز على اليورو والجوائز الشابة."},
-            {n:"غافي", nat:"إسباني", c:"برشلونة الإسباني", p:"لاعب وسط مقاتل وشرس", f:"يلعب بروح قتالية عالية جداً ولا يهاب التدخلات العنيفة رغم صغر سنه."},
-            {n:"أوريليين تشواميني", nat:"فرنسي", c:"ريال مدريد الإسباني", p:"لاعب ارتكاز دفاعي قوي", f:"صخرة الوسط وقطع الكرات وصاحب القذائف القوية من مسافات بعيدة."},
-            {n:"إدواردو كامافينغا", nat:"فرنسي", c:"ريال مدريد الإسباني", p:"لاعب جوكر متعدد المراكز", f:"يلعب كارتكاز، ظهير أيسر، أو وسط هجومي بنجاح وإتقان إعجازي مذهل."},
-            {n:"عثمان ديمبيلي", nat:"فرنسي", c:"باريس سان جيرمان", p:"جناح سريع ثنائي القدمين", f:"يمتاز بالمراوغة يميناً ويساراً بنفس الكفاءة وسرعة انطلاق خارقة."},
-            {n:"أشرف داري", nat:"مغربي", c:"الأهلي المصري", p:"قلب دفاع صلب", f:"ساهم في الإنجاز المونديالي التاريخي للمغرب وانتقل لقلعة الجزيرة الحمراء."},
-            {n:"مروان عطية", nat:"مصري", c:"الأهلي المصري", p:"لاعب ارتكاز ضابط للوسط", f:"مسمار خط الوسط الحاصل على دوري أبطال أفريقيا بفضل قطع الكرات المستمر."},
-            {n:"حسين الشحات", nat:"مصري", c:"الأهلي المصري", p:"جناح مهارى هداف الكبار", f:"صاحب الأرقام القياسية والمراوغات الشهيرة في مونديال الأندية."},
-            {n:"أحمد سيد زيزو", nat:"مصري", c:"الزمالك المصري", p:"جناح أيمن طائر هداف", f:"نجم الدوري المصري والمسؤول الأول عن العرضيات والركلات الحرة والجزاء القاتلة."},
-            {n:"شيكابالا", nat:"مصري", c:"الزمالك المصري", p:"ساحر مهارى أيسر تاريخي", f:"صاحب اللمسات السحرية والأهداف المقوسة الخرافية التي تسكن الزاوية البعيدة (R2)."}
+        // مصفوفة لتكملة الـ 200 لاعب بأسماء حقيقية ومختلفة تماماً (بدون نسخ) لملء قاعدة البيانات
+        const fillerData = [
+            { name: "لويس سواريز", nat: "أوروغوياني", club: "إنتر ميامي الأمريكي", pos: "مهاجم صريح (البستوليرو)", feat: "الحذاء الذهبي الأسطوري وهداف ليفربول وبرشلونة وأتلتيكو مدريد السابق المميز." },
+            { name: "سيرخيو راموس", nat: "إسباني", club: "لاعب حر", pos: "قلب دفاع تاريخي", feat: "قائد ريال مدريد الأسطوري وصاحب الرأسية الشهيرة بالدقيقة 92:48 بنهائي العاشرة." },
+            { name: "توني كروس", nat: "ألماني", club: "معتزل", pos: "مهندس خط الوسط الموّجه", feat: "صاحب التمريرات الدقيقة بنسبة 99% واعتزل بعد تحقيق دوري أبطال أوروبا 2024." },
+            { name: "الحسين عموتة", nat: "مغربي", club: "مدرب", pos: "إطار فني قدير", feat: "قاد منتخب الأردن لإنجاز تاريخي بالوصول لنهائي كأس آسيا لأول مرة." },
+            { name: "إيدرسون", nat: "برازيلي", club: "مانشستر سيتي", pos: "حارس مرمى بارع بالقدم", feat: "يمتاز بتمريراته الطويلة التي تتحول لأسيستات مباشرة ومساهم بالثلاثية." },
+            { name: "مارك أندريه تير شتيغن", nat: "ألماني", club: "برشلونة الإسباني", pos: "حارس مرمى", feat: "حارس برشلونة الأساسي وصاحب بناء اللعب المميز من الخلف وقائد الفريق." },
+            { name: "مانويل نوير", nat: "ألماني", club: "بايرن ميونخ", pos: "حارس مرمى (سويبر كيبير)", feat: "أعاد تعريف مركز حراسة المرمى بالخروج خارج الصندوق وتوج بكأس العالم 2014." },
+            { name: "يان أوبلاك", nat: "سلوفيني", club: "أتلتيكو مدريد", pos: "حارس مرمى جدار", feat: "فاز بجائزة زامورا لأفضل حارس بإسبانيا عدة مرات بفضل تصدياته الإعجازية." },
+            { name: "أشلي كول", nat: "إنجليزي", club: "معتزل", pos: "ظهير أيسر تاريخي", feat: "يعتبره الكثيرون أفضل ظهير أيسر في تاريخ الدوري الإنجليزي الممتاز مع أرسنال وتشيلسي." },
+            { name: "ألفونسو ديفيز", nat: "كندي", club: "بايرن ميونخ", pos: "ظهير أيسر قطار سريع", feat: "يمتاز بإنطلاقاته النفاثة السريعة وساهم بسداسية البايرن التاريخية 2020." },
+            { name: "ثيو هيرنانديز", nat: "فرنسي", club: "ميلان الإيطالي", pos: "ظهير أيسر هجومي", feat: "صاروخ ميلان على الجهة اليسرى ويمتاز بتسجيل أهداف انفرادية من المرمى للمرمى." },
+            { name: "أندرو روبرتسون", nat: "اسكتلندي", club: "ليفربول الإنجليزي", pos: "ظهير أيسر مقاتل", feat: "محرك جبهة ليفربول اليسرى وصاحب العرضيات المتقنة والشراكة التاريخية مع أرنولد." },
+            { name: "ترينت ألكسندر أرنولد", nat: "إنجليزي", club: "ليفربول الإنجليزي", pos: "ظهير أيمن صانع ألعاب", feat: "صاحب الركنية الشهيرة السريعة ضد برشلونة ويمتاز بتمريرات طويلة كصانع ألعاب." },
+            { name: "داني كارفاخال", nat: "إسباني", club: "ريال مدريد الإسباني", pos: "ظهير أيمن محارب", feat: "حصد 6 ألقاب دوري أبطال أوروبا وسجل في نهائي 2024 برأسية ضد دورتموند." },
+            { name: "كايل ووكر", nat: "إنجليزي", club: "مانشستر سيتي", pos: "ظهير أيمن قطار سريع", feat: "أسرع مدافع بالبريميرليج والمتخصص الأول في إيقاف خطورة المهاجمين السريعين." },
+            { name: "أشرف داري", nat: "مغربي", club: "الأهلي المصري", pos: "قلب دفاع صلب", feat: "صخرة الدفاع المغربية الحائز على الوداد والمنتقل حديثاً لتدعيم دفاع الأهلي." },
+            { name: "يحيى عطية الله", nat: "مغربي", club: "الأهلي المصري", pos: "ظهير أيسر مهارى", feat: "صاحب العرضية التاريخية ليوسف النصيري ضد البرتغال بمونديال قطر التاريخي." },
+            { name: "وسام أبو علي", nat: "فلسطيني", club: "الأهلي المصري", pos: "مهاجم هداف سريع", feat: "الفدائي وهداف الدوري المصري المتألق بمهارته وحسه التهديفي العالي بالصندوق." },
+            { name: "إمام عاشور", nat: "مصري", club: "الأهلي المصري", pos: "لاعب وسط هجومي صاروخي", feat: "يمتاز بتسديداته المرعبة واختراقاته لخطوط الخصوم وحسم المباريات الكبرى." },
+            { name: "محمود حسن تريزيجيه", nat: "مصري", club: "الريان القطري", pos: "جناح أيسر مقاتل", feat: "يمتاز بالركض اللانهائي والروح العالية والتسديد القوي مع منتخب مصر." },
+            { name: "مصطفى محمد", nat: "مصري", club: "نانت الفرنسي", pos: "مهاجم صريح (الأناكوندا)", feat: "يمتاز بارتقاءات هوائية مرعبة تترجم لعرضيات رأسية داخل شباك الخصوم بأوروبا." },
+            { name: "عمر مرموش", nat: "مصري", club: "آينتراخت فرانكفورت", pos: "مهاجم / جناح هداف", feat: "انفجرت موهبته بالدوري الألماني وأصبح من أفضل هدافي وصناع أوروبا بالبوندسليغا." },
+            { name: "محيي الدين مفتاح", nat: "جزائري", club: "معتزل", pos: "مدافع تاريخي", feat: "من أساطير الدفاع في الكرة الجزائرية ونادي شبيبة القبائل واتحاد العاصمة سابقا." },
+            { name: "بغداد بونجاح", nat: "جزائري", club: "الشمال القطري", pos: "مهاجم قناص الكؤوس", feat: "صاحب هدف تتويج الجزائر بكأس أمم أفريقيا 2019 والهداف التاريخي لنادي السد." },
+            { name: "يوسف بلايلي", nat: "جزائري", club: "الترجي التونسي", pos: "جناح مهارى عبقري", feat: "صاحب الهدف الأسطوري من نصف الملعب ضد المغرب بكأس العرب وصانع ألعاب ممتع." },
+            { name: "عيسى ماندي", nat: "جزائري", club: "ليل الفرنسي", pos: "قلب دفاع تكتيكي", feat: "مدافع جزائري ذكي يتميز ببناء اللعب من الخلف ومسيرة طويلة في إسبانيا وفرنسا." },
+            { name: "رامي بن سبعيني", nat: "جزائري", club: "بوروسيا دورتموند", pos: "ظهير أيسر / مدافع", feat: "صخرة دفاعية بالدوري الألماني ويمتاز بصلابته وتنفيذه الممتاز لركلات الجزاء." },
+            { name: "إسماعيل بن ناصر", nat: "جزائري", club: "ميلان الإيطالي", pos: "لاعب ارتكاز (الدينامو)", feat: "أفضل لاعب في كأس أمم أفريقيا 2019 ومحرك خط وسط الروسونيري ميلان." },
+            { name: "حكيم زياش", nat: "مغربي", club: "غلطة سراي التركي", pos: "جناح أيمن (الساحر المخادع)", feat: "يمتاز بتمريراته العرضية المقوسة السحرية وبلوغ نصف نهائي المونديال وأبطال أوروبا مع أياكس." },
+            { name: "سفيان أمرابط", nat: "مغربي", club: "فنربخشة التركي", pos: "لاعب ارتكاز (المقاتل الوتد)", feat: "رئة منتخب المغرب بمونديال 2022 وصاحب اللقطة الشهيرة بقطع الكرة من مبابي." },
+            { name: "يوسف النصيري", nat: "مغربي", club: "فنربخشة التركي", pos: "مهاجم طائر", feat: "صاحب أعلى ارتقاء رأسي تاريخي بمونديال قطر الذي أقصى البرتغال بملحمة ربع النهائي." },
+            { name: "عز الدين أوناحي", nat: "مغربي", club: "باناثينايكوس", pos: "لاعب وسط رشيقة مهارى", feat: "أبهر لويس إنريكي بمونديال قطر بمراوغاته وركضه السلس بخط وسط الأسود." },
+            { name: "نايف أكرد", nat: "مغربي", club: "ريال سوسيداد", pos: "قلب دفاع أنيق", feat: "يمتاز بالطول وبناء اللعب بالقدم اليسرى بدقة عالية وأحد ركائز رابع العالم." },
+            { name: "رياض بودبوز", nat: "جزائري", club: "شبيبة القبائل", pos: "صانع ألعاب مهارى", feat: "اشتهر بلمساته الفنية الساحرة في الدوري الفرنسي وبتنفيذه المتقن للركلات الثابتة." },
+            { name: "عبد الرزاق حمد الله", nat: "مغربي", club: "الشباب السعودي", pos: "الجلاد القناص", feat: "الهداف التاريخي لموسم واحد بالدوري السعودي بـ 34 هدفاً ومحطم الأرقام القياسية." },
+            { name: "ألكسندر ميتروفيتش", nat: "صربي", club: "الهلال السعودي", pos: "مهاجم صندوق كاسحة", feat: "دبابة هجومية لا ترحم بالرأس والقدم وقاد الهلال لسلسلة الانتصارات التاريخية." },
+            { name: "سيرغي ميلينكوفيتش سافيتش", nat: "صربي", club: "الهلال السعودي", pos: "لاعب وسط متكامل عملاق", feat: "يمتاز بالقوة البدنية والارتقاء الهوائي والتسجيل بالصندوق كصانع ألعاب وهداف." },
+            { name: "روبن نيفيز", nat: "برتغالي", club: "الهلال السعودي", pos: "لاعب ارتكاز وضابط إيقاع", feat: "يمتاز بتمريراته الطويلة القاتلة وتسديداته الصاروخية البعيدة من خارج المنطقة." },
+            { name: "مالكوم", nat: "برازيلي", club: "الهلال السعودي", pos: "جناح سريع ذكي", feat: "نجم برشلونة السابق وهداف المواعيد الكبرى والحواسم في البطولات السعودية." },
+            { name: "كريستيان تيو", nat: "إسباني", club: "العروبة السعودي", pos: "جناح سريع مخترق", feat: "خريج أكاديمية لاماسيا ببرشلونة ويمتاز بالسرعة الخارقة والإنهاء المقوس الفاخر." },
+            { name: "ساديو ماني", nat: "سنغالي", club: "النصر السعودي", pos: "جناح / مهاجم سريع", feat: "بطل أفريقيا مع السنغال وصاحب الشراكة المرعبة السابقة مع صلاح في ليفربول." },
+            { name: "مارسيلو بروزوفيتش", nat: "كرواتي", club: "النصر السعودي", pos: "لاعب ارتكاز ذو رئة حديدية", feat: "صاحب أعلى معدلات ركض في أوروبا وقائد وسط إنتر ميلان السابق بنهائي الأبطال." },
+            { name: "أيميريك لابورت", nat: "إسباني", club: "النصر السعودي", pos: "قلب دفاع أنيق باليسرى", feat: "بطل البريميرليج مع السيتي وبطل اليورو 2024 أساسياً مع لاروخا الإسبانية." },
+            { name: "أوتافيو", nat: "برتغالي", club: "النصر السعودي", pos: "لاعب وسط مقاتل صانع", feat: "يمتاز بالربط السريع بين الخطوط وصناعة الفرص والضغط العالي المستمر." },
+            { name: "تاليسكا", nat: "برازيلي", club: "النصر السعودي", pos: "صانع ألعاب / مهاجم هداف", feat: "صاحب القدم اليسرى الساحرة والتسديدات المقوسة والركلات الحرة الطويلة المرعبة." },
+            { name: "رياض محرز", nat: "جزائري", club: "الأهلي السعودي", pos: "جناح مهارى (كنترول قاتل)", feat: "صاحب أفضل استلام كرة بالعالم المتوج بالبريميرليج التاريخي مع ليستر والسيتي." },
+            { name: "روبرتو فيرمينو", nat: "برازيلي", club: "الأهلي السعودي", pos: "مهاجم وهمي (بوبي)", feat: "مبتكر مركز المهاجم التكتيكي المخترق وبطل دوري أبطال أوروبا مع الريدز." },
+            { name: "فرانك كيسي", nat: "إيفواري", club: "الأهلي السعودي", pos: "لاعب وسط صخرة بدنية", feat: "قاد ميلان للاسكوديتو وسجل هدف حسم الكلاسيكو لبرشلونة وبطل أفريقيا للفيلة." },
+            { name: "رياض شراحيلي", nat: "سعودي", club: "نيوم", pos: "لاعب ارتكاز دفاعي", feat: "يمتاز بالصلابة وقطع الكرات وساهم في تشكيلة الصقور الخضر الدولية سابقاً." },
+            { name: "غابري فييغا", nat: "إسباني", club: "الأهلي السعودي", pos: "موهبة وسط صاعدة", feat: "أبهر الدوري الإسباني مع سيلتا فيغو واختار الانطلاق للدوري السعودي بقوة." },
+            { name: "إدوارد ميندي", nat: "سنغالي", club: "الأهلي السعودي", pos: "حارس مرمى (The Wall)", feat: "أفضل حارس في العالم من الفيفا 2021 بعد التتويج بدوري أبطال أوروبا مع تشيلسي." },
+            { name: "كريم بنزيما", nat: "فرنسي", club: "الاتحاد السعودي", pos: "الهداف التاريخي (الحكومة)", feat: "صاحب البالون دور الإعجازي 2022 وثاني الهدافين التاريخيين لريال مدريد الملكي." },
+            { name: "نجولو كانتي", nat: "فرنسي", club: "الاتحاد السعودي", pos: "لاعب ارتكاز (رئة العالم)", feat: "اللاعب المحبوب المتوج بكأس العالم والبريميرليج والأبطال، يغطي الأرض كاملة." },
+            { name: "فابينيو", nat: "برازيلي", club: "الاتحاد السعودي", pos: "لاعب وسط دفاعي (المدمرة)", feat: "مسمار خط وسط ليفربول الذهبي السابق الحائز على كل الألقاب الممكنة مع كلوب." },
+            { name: "حسام عوار", nat: "جزائري", club: "الاتحاد السعودي", pos: "صانع ألعاب مهارى ناعم", feat: "نجم ليون وروما السابق ويمتاز بالمرور السلس والتمرير الذكي بالعمق الهجومي." },
+            { name: "موسى ديابي", nat: "فرنسي", club: "الاتحاد السعودي", pos: "جناح نفاثة سريع جداً", feat: "صاروخ على الأطراف قادم من البريميرليج وأستون فيلا بمهارات وسرعات قياسية." },
+            { name: "ستيفن بيرغوين", nat: "هولندي", club: "الاتحاد السعودي", pos: "جناح هجومي قوي", feat: "قائد أياكس ونجم توتنهام السابق ويمتاز بالقوة البدنية والاختراق العرضي بالصندوق." },
+            { name: "روبن كوايسون", nat: "سويدي", club: "الاتفاق السعودي", pos: "مهاجم متحرك سريع", feat: "هداف منتخب السويد ويمتاز بالمرونة واللعب في كل مراكز الهجوم بنجاح." },
+            { name: "جورجينيو فينالدوم", nat: "هولندي", club: "الاتفاق السعودي", pos: "لاعب وسط بوكس تو بوكس", feat: "صاحب الثنائية الشهيرة البديلة ضد برشلونة بريمونتادا الـ 4-0 التاريخية للريدز." },
+            { name: "جواو كانسيلو", nat: "برتغالي", club: "الهلال السعودي", pos: "ظهير عصري صانع ألعاب", feat: "يمتاز بالعرضيات بوجه القدم الخارجي بعبقرية ولعب للريال والبرسا والبايرن والسيتي." },
+            { name: "فرانك كوم", nat: "كاميروني", club: "لاعب حر", pos: "ارتكاز دفاعي قوي", feat: "دبابة وسط أفريقية حصد دوري أبطال أفريقيا مع الترجي التونسي وله تجارب عربية عديدة." },
+            { name: "نعيم السليتي", nat: "تونسي", club: "الأهلي القطري", pos: "صانع ألعاب مهارى مراوغ", feat: "ساحر نسور قرطاج ويمتاز بمراوغاته الفردية الضيقة التي تفكك أعتى الدفاعات." },
+            { name: "يوسف المساكني", nat: "تونسي", club: "العربي القطري", pos: "النمس الأسطوري تكتيكياً", feat: "قائد تونس الأبرز في العقد الأخير وصاحب الأهداف الإعجازية في بطولات أفريقيا." },
+            { name: "سيف الدين الجزيري", nat: "تونسي", club: "الزمالك المصري", pos: "مهاجم قناص متحرك", feat: "هداف كأس العرب بقطر والمهاجم الأساسي للقلعة البيضاء بالبطولات الأفريقية." },
+            { name: "حمزة المثلوثي", nat: "تونسي", club: "الزمالك المصري", pos: "مدافع جوكر صلب", feat: "ظهير أيمن تحول لقلب دفاع مقاتل وأصبح من ركائز دفاع الزمالك الحواسم." },
+            { name: "عمر جابر", nat: "مصري", club: "الزمالك المصري", pos: "ظهير جوكر خبرة", feat: "ابن نادي الزمالك الحائز على تجارب أوروبية وأمريكية ويمتاز بالوفاء والركض المستمر." },
+            { name: "نبيل عماد دونجا", nat: "مصري", club: "الزمالك المصري", pos: "لاعب ارتكاز مقاتل", feat: "مقاتل خط الوسط الأبيض المتخصص بقطع التمريرات وبناء الهجمات بسرعة للزمالك." },
+            { name: "شيكابالا", nat: "مصري", club: "الزمالك المصري", pos: "الأباتشي الأسطوري (صاحب الR2)", feat: "قائد الزمالك التاريخي صاحب اللمسات الساحرة والأهداف المقوسة في الزاوية البعيدة." },
+            { name: "ناصر ماهر", nat: "مصري", club: "الزمالك المصري", pos: "صانع ألعاب حريّف", feat: "يمتاز برؤية الملعب والتحكم بالكرة تحت الضغط وصناعة الكرات الحاسمة للمهاجمين." },
+            { name: "أحمد الشناوي", nat: "مصري", club: "بيراميدز المصري", pos: "حارس مرمى ردود فعل سريعة", feat: "حارس دولي مصري مخضرم يمتاز بالطول وبناء الهجمات الطويلة بدقة." },
+            { name: "رمضان صبحي", nat: "مصري", club: "بيراميدز المصري", pos: "جناح أيسر قوي مراوغ", feat: "خريج الأهلي ونجم الدوري الإنجليزي السابق ويمتاز بالقوة البدنية في حماية الكرة." },
+            { name: "فيستون مايلي", nat: "كونغولي", club: "بيراميدز المصري", pos: "مهاجم قناص مرعب", feat: "الدبابة الهجومية هداف الكونغولي صاحب الاحتفالية الشهيرة والمرعبة للشباك." },
+            { name: "بلاتي توريه", nat: "بوركيني", club: "بيراميدز المصري", pos: "لاعب ارتكاز حديدي", feat: "أفضل لاعبي الوسط في أمم أفريقيا ويمتاز باللياقة البدنية الرهيبة والافتكاك النظيف." },
+            { name: "محمد حمدي", nat: "مصري", club: "بيراميدز المصري", pos: "ظهير أيسر متوازن", feat: "الظهير الأيسر لمنتخب مصر ويمتاز بالعرضيات المتقنة والالتزام الدفاعي الصارم." },
+            { name: "مصطفى فتحي", nat: "مصري", club: "بيراميدز المصري", pos: "جناح أيمن (السافل المهارى)", feat: "صاحب الأقدام الحريرية والمراوغات المفاجئة في المساحات الضيقة جداً." },
+            { name: "مهند لاشين", nat: "مصري", club: "بيراميدز المصري", pos: "لاعب وسط مدافع ذكي", feat: "يمتاز بالهدوء وتمرير الكرة القصير وضبط ريتم منتصف الملعب ببراعة." },
+            { name: "محمد الشناوي", nat: "مصري", club: "الأهلي المصري", pos: "السد العالي وحامي العرين", feat: "قائد الأهلي التاريخي بطل أفريقيا المتعدد والحارس الأساسي للفراعنة بالمحافل العالمية." },
+            { name: "مصطفى شوبير", nat: "مصري", club: "الأهلي المصري", pos: "حارس مرمى صاعد واعد", feat: "تألق ببطولة دوري أبطال أفريقيا وحافظ على نظافة شباكه كاملة ليتوج بالذهب التثبيتي." },
+            { name: "رامي ربيعة", nat: "مصري", club: "الأهلي المصري", pos: "قلب دفاع خبرة الكؤوس", feat: "المدافع الهداف الأكثر تتويجاً بدوري أبطال أفريقيا بالجيل الحالي للأهلي." },
+            { name: "ياسر إبراهيم", nat: "مصري", club: "الأهلي المصري", pos: "قلب دفاع (صخرة المونديال)", feat: "مدافع فدائي يعشقه الجماهير لصلابته وأهدافه الرأسية الحاسمة بكأس العالم للأندية." },
+            { name: "محمد هاني", nat: "مصري", club: "الأهلي المصري", pos: "ظهير أيمن تكتيكي", feat: "ابن النادي صاحب الخبرة الكبيرة والمباريات التاريخية ضد نجوم العالم بالمونديال." },
+            { name: "أكرم توفيق", nat: "مصري", club: "الأهلي المصري", pos: "المحارب الجوكر (موفاسا)", feat: "يلعب بروح قتالية انتحارية في مركز الظهير الأيمن أو الارتكاز بقطع الكرات الشرس." },
+            { name: "عمر كمال عبد الواحد", nat: "مصري", club: "الأهلي المصري", pos: "جوكر الأطراف السريع", feat: "يجيد اللعب كظهير أيمن، أيسر، أو جناح، ويمتاز بتسديدات صاروخية بعيدة." },
+            { name: "يحيى جبران", nat: "مغربي", club: "الكويت الكويتي", pos: "قائد ارتكاز تكتيكي", feat: "القائد السابق للوداد البيضاوي الحائز على دوري أبطال أفريقيا بفضل ركلات الجزاء المتقنة." },
+            { name: "بدر بانون", nat: "مغربي", club: "قطر القطري", pos: "السلطان (مدافع أنيق)", feat: "يمتاز ببرود أعصابه وبناء اللعب من الخلف وتنفيذ ركلات الترجيح كأنه صانع ألعاب." },
+            { name: "أحمد حجازي", nat: "مصري", club: "نيوم السعودي", pos: "الحاجز (صخرة الدفاع)", feat: "قائد الاتحاد والمنتخب السابق الحاصل على الدوري بصلابته البدنية وتوجيهاته القيادية." },
+            { name: "محمد النني", nat: "مصري", club: "الجزيرة الإماراتي", pos: "لاعب وسط مدفعجي خبرة", feat: "نجم أرسنال الإنجليزي السابق وصاحب التسديدات الصاروخية البعيدة بالبطولات الأوروبية." },
+            { name: "عمر خريبين", nat: "سوري", club: "الوحدة الإماراتي", pos: "مهاجم هداف آسيا", feat: "أفضل لاعب في آسيا سابقاً والهداف المرعب الحاسم بالدوري الإماراتي والسعودي." },
+            { name: "فابيو ليما", nat: "إماراتي", club: "الوصل الإماراتي", pos: "ساحر مهارى هداف", feat: "أيقونة الوصل وصاحب الأهداف الإعجازية من الركلات الحرة والتسديدات اليسارية المقوسة." },
+            { name: "كايو كانيدو", nat: "إماراتي", club: "الوصل الإماراتي", pos: "مهاجم متحرك سريع", feat: "يمتاز بالضغط العالي والسرعة الكبيرة والارتقاءات الرأسية الذكية بالهجوم الإماراتي." },
+            { name: "سفيان رحيمي", nat: "مغربي", club: "العين الإماراتي", pos: "المرعب هداف آسيا والمونديال", feat: "قاد العين للتتويج بدوري أبطال آسيا بهتك شباك كبار الأندية وهداف الأولمبياد التاريخي." },
+            { name: "لابا كودجو", nat: "توغولي", club: "العين الإماراتي", pos: "قناص الصندوق العملاق", feat: "الهداف الخارق لنادي العين ويمتاز بالقوة البدنية والإنهاء المثالي أمام المرمى." },
+            { name: "بندر الأحبابي", nat: "إماراتي", club: "العين الإماراتي", pos: "ظهير / جناح (ملك الأسيست)", feat: "قائد العين وصاحب العرضيات الأرضية والعالية بالمسطرة لخط الهجوم." },
+            { name: "خالد عيسى", nat: "إماراتي", club: "العين الإماراتي", pos: "حارس مرمى الكؤوس المونديالية", feat: "حارس العين والمنتخب التاريخي المتألق بالتصدي لركلات الترجيح العالمية." },
+            { name: "علي صالح", nat: "إماراتي", club: "الوصل الإماراتي", pos: "جناح مهارى سريع واعد", feat: "الفتى الذهبي للكرة الإماراتية ويمتاز بالمراوغة من الجناح للعمق والتسديد الفاخر." },
+            { name: "إسماعيل مطر", nat: "إماراتي", club: "معتزل (سمعة الأسطورة)", pos: "صانع ألعاب أسطوري خارق", feat: "أسطورة الكرة الإماراتية الخالدة وصاحب الأهداف الذهبية التاريخية ببطولات الخليج." },
+            { name: "ياسين إبراهيمي", nat: "جزائري", club: "الغرافة القطري", pos: "ملك المراوغة الفردية", feat: "من أفضل المراوغين بالعالم الحاصل على لقب أفضل لاعب بالدوري البرتغالي والقطري." },
+            { name: "أكرم عفيف", nat: "قطري", club: "السد القطري", pos: "ساحر آسيا والمواعيد الكبرى", feat: "أفضل لاعب في آسيا وقاد قطر للتتويج بكأس آسيا مرتين متتاليتين بهاتريك النهائي." },
+            { name: "المعز علي", nat: "قطري", club: "الدحيل القطري", pos: "مهاجم هداف آسيا التاريخي", feat: "الهداف التاريخي لنسخة واحدة بكأس آسيا وصاحب الهدف المقصي الأسطوري بنهائي 2019." },
+            { name: "حسن الهيدوس", nat: "قطري", club: "السد القطري", pos: "القائد الخالد المحنك", feat: "قائد منتخب قطر التاريخي المعتزل دولياً الحائز على لقبي كأس آسيا بلمساته القيادية." },
+            { name: "بغداد بونجاح", nat: "جزائري", club: "الشمال القطري", pos: "قناص الأرقام القياسية", feat: "سجل 7 أهداف بمباراة واحدة بالدوري القطري وصاحب أهداف الحسم القارية." },
+            { name: "يوسف عتال", nat: "جزائري", club: "السد القطري", pos: "ظهير أيمن نفاثة سريع", feat: "يمتاز بالقدرة الهجومية الخارقة والمراوغة كأنه جناح وصاحب يورو أفريقيا 2019." },
+            { name: "أندي ديلور", nat: "فرنسي / جزائري", club: "مولودية الجزائر", pos: "مهاجم بولدوزر قوي", feat: "يمتاز بالقوة البدنية والتسديدات الصاروخية العنيفة واللعب بروح قتالية عالية." },
+            { name: "إسلام سليماني", nat: "جزائري", club: "شباب بلوزداد", pos: "الهداف التاريخي لمحاربي الصحراء", feat: "هداف الجزائر التاريخي وصاحب الأهداف الحاسمة بمونديال البرازيل 2014 الشهير." },
+            { name: "هلال سوداني", nat: "جزائري", club: "الفتح السعودي", pos: "مهاجم / جناح حاسم", feat: "هداف البطولات الأوروبية مع دينامو زغرب وصاحب اللمسات الحاسمة بمنتخب الجزائر." },
+            { name: "وهبي خزري", nat: "تونسي", club: "مونبلييه الفرنسي", pos: "مهاجم / صانع ألعاب صاروخي", feat: "سجل أهدافاً تاريخية لتونس بالمونديال أبرزها هدف الفوز التاريخي الأسطوري ضد فرنسا 2022." },
+            { name: "إلياس السخيري", nat: "تونسي", club: "آينتراخت فرانكفورت", pos: "ارتكاز ضابط المسافات", feat: "أكثر لاعبي البوندسليغا ركضاً ويمتاز بافتكاك الكرة والذكاء التكتيكي الرفيع." },
+            { name: "عيسى العيدوني", nat: "تونسي", club: "الوكرة القطري", pos: "المحارب الشرس بخط الوسط", feat: "يمتاز بالغرينتا والروح العالية القتالية وصاحب اللقطة الشهيرة بالاحتفال بتاكلينغ ضد الدنمارك." },
+            { name: "منتصر الطالبي", nat: "تونسي", club: "لوريان الفرنسي", pos: "قلب دفاع صخرة هوائية", feat: "مدافع تونس الأساسي الصلب ويمتاز بالقوة البدنية والهدوء في تشتيت الكرات." },
+            { name: "علي معلول", nat: "تونسي", club: "الأهلي المصري", pos: "أسرع دليفري في مصر (ملك الحلول)", feat: "الظهير الأيسر الهداف التاريخي للأهلي وصاحب الأسيستات والأهداف الحاسمة ببطولات أفريقيا." },
+            { name: "سيف الدين الخاوي", nat: "تونسي", club: "خورفكان الإماراتي", pos: "لاعب وسط هجومي أنيق", feat: "نجم أولمبيك مارسيليا السابق ويمتاز بالمهارة واللعب بدقة في صناعة اللعب بملعبنا." },
+            { name: "أليكسيس ماك أليستر", nat: "أرجنتيني", club: "ليفربول الإنجليزي", pos: "لاعب وسط تكتيكي ذكي", feat: "بطل العالم 2022 ومحرك خط وسط ليفربول الحالي بالتمريرات السحرية المتقنة." },
+            { name: "إنزو فيرنانديز", nat: "أرجنتيني", club: "تشيلسي الإنجليزي", pos: "لاعب ارتكاز صانع ألعاب", feat: "أفضل لاعب شاب في مونديال قطر 2022 ويمتاز برؤية الملعب الكاشفة والتمرير الطويل." },
+            { name: "جوليان ألفاريز", nat: "أرجنتيني", club: "أتلتيكو مدريد", pos: "المهاجم العنكبوت الحاسم", feat: "حصد كأس العالم والأبطال والليغا والبريميرليج بعمر صغير هدافاً تكتيكياً مرعباً." },
+            { name: "لاوتارو مارتينيز", nat: "إيطالي / أرجنتيني", club: "إنتر ميلان الإيطالي", pos: "الـتورو (الهداف القناص)", feat: "قائد إنتر ميلان وهداف الدوري الإيطالي وبطل الكوبا أمريكا صاحب هدف الحسم التتويجي." },
+            { name: "باولو ديبالا", nat: "أرجنتيني", club: "روما الإيطالي", pos: "الجواهر (صاحب اليسارية الساحرة)", feat: "يمتاز بمهاراته الفردية العالية وتسديداته المقوسة الذكية وركلات الجزاء الحواسم." },
+            { name: "أنخيل دي ماريا", nat: "أرجنتيني", club: "بنفيكا البرتغالي", pos: "رجل النهائيات الكبرى المخلص", feat: "سجل في نهائي الأولمبياد، نهائي الكوبا، ونهائي كأس العالم 2022 بعبقرية كروية خلدت." },
+            { name: "فيديريكو كييزا", nat: "إيطالي", club: "ليفربول الإنجليزي", pos: "جناح نفاثة سريع ومخترق", feat: "بطل يورو 2020 مع إيطاليا بفضل انطلاقاته القوية وحسه التهديفي السريع على الأطراف." },
+            { name: "نيكولو باريلا", nat: "إيطالي", club: "إنتر ميلان الإيطالي", pos: "رئة خط الوسط الإيطالي", feat: "يمتاز بالركض اللانهائي وصناعة الأهداف والتسديدات الطائرة على الطاير بالدوري." },
+            { name: "أليساندرو باستوني", nat: "إيطالي", club: "إنتر ميلان الإيطالي", pos: "مدافع صانع ألعاب بالقدم", feat: "يمتاز بالكرات الطويلة الدقيقة وبناء الهجمات من خط الدفاع ببراعة باليسرى." },
+            { name: "جيانلويجي دوناروما", nat: "إيطالي", club: "باريس سان جيرمان", pos: "حارس مرمى عملاق التصديات", feat: "أفضل لاعب في يورو 2020 بعد قيادة إيطاليا للقب بصد ركلات الترجيح الصعبة." },
+            { name: "ماركو فيراتي", nat: "إيطالي", club: "العربي القطري", pos: "المايسترو القصير المكير", feat: "يمتاز بالخروج بالكرة تحت الضغط الخرافي بمهارة وسلاسة خط وسط باريس سابقاً." },
+            { name: "جيرارد بيكيه", nat: "إسباني", club: "معتزل", pos: "مدافع بطل العالم وأوروبا", feat: "صخرة دفاع برشلونة الذهبية الحائز على السداسية التاريخية وكل الألقاب الممكنة." },
+            { name: "سيرجيو بوسكيتس", nat: "إسباني", club: "إنتر ميامي الأمريكي", pos: "ارتكاز ذكي (صاحب السهل الممتنع)", feat: "أفضل لاعب ارتكاز يقرأ الملعب ويفكك ضغط الخصوم بلمسة واحدة بارعة غيرت مفاهيم المركز." },
+            { name: "جوردي ألبا", nat: "إسباني", club: "إنتر ميامي الأمريكي", pos: "ظهير أيسر سريع العرضيات", feat: "شكل شراكة ثنائية تاريخية مرعبة مع ميسي في برشلونة بالتمريرات الأرضية السريعة." },
+            { name: "سيسك فابريجاس", nat: "إسباني", club: "معتزل", pos: "صانع ألعاب التمريرات الحريرية", feat: "صاحب التمريرة الحاسمة لهدف إنييستا في نهائي كأس العالم 2010 الأسطوري." },
+            { name: "دافيد سيلفا", nat: "إسباني", club: "معتزل (الساحر الصغير)", pos: "صانع ألعاب ساحر اللمسات", feat: "أسطورة مانشستر سيتي وهيكل إسبانيا الذهبي المتميز بالتحرك الذكي بين الخطوط." },
+            { name: "تشافي هيرنانديز", nat: "إسباني", club: "مدرب", pos: "كمبيوتر خط الوسط الموجه", feat: "عقل التيكي تاكا المدبر وصاحب الدوران الأسطوري بنصف الملعب لحفظ الكرة بدقة." },
+            { name: "إيكر كاسياس", nat: "إسباني", club: "معتزل (القديس الحارس)", pos: "حارس مرمى أسطوري تاريخي", feat: "قائد ريال مدريد وإسبانيا الحائز على المونديال واليورو والأبطال بتصديات انفرادية إعجازية." },
+            { name: "كول بالمر", nat: "إنجليزي", club: "تشيلسي الإنجليزي", pos: "صانع ألعاب وهداف (Cold)", feat: "يمتاز ببرود أعصابه أمام المرمى وتنفيذه الحاسم لركلات الجزاء واحتفالية الشتاء الشهيرة." },
+            { name: "فيل فودين", nat: "إنجليزي", club: "مانشستر سيتي", pos: "جناح / صانع ألعاب مهارى", feat: "الفتى المدلل لغوارديولا الحاصل على أفضل لاعب بالبريميرليج بفضل أهدافه الخرافية." },
+            { name: "هاري كين", nat: "إنجليزي", club: "بايرن ميونخ", pos: "مهاجم هداف (الحذاء الذهبي)", feat: "الهداف التاريخي لتوتنهام ومنتخب إنجلترا وماكينة أهداف لا تتوقف بالبوندسليغا." },
+            { name: "ديكلان رايس", nat: "إنجليزي", club: "أرسنال الإنجليزي", pos: "لاعب وسط ارتكاز صخرة", feat: "انتقل بصفقة قياسية للمدفعجية وأصبح صمام الأمان وقاطع كرات البريميرليج الأول." },
+            { name: "جاك غريليش", nat: "إنجليزي", club: "مانشستر سيتي", pos: "جناح أيسر يحفظ الكرة", feat: "يمتاز بقدرته الخارقة على استدراج المدافعين والحصول على أخطاء وضمان الاستحواذ." },
+            { name: "جون ستونز", nat: "إنجليزي", club: "مانشستر سيتي", pos: "مدافع / ارتكاز وهمي عبقري", feat: "حوّله غوارديولا للاعب وسط متقدم في نهائي أبطال أوروبا ليقدم جولة إعجازية مذهلة." },
+            { name: "جوردان هندرسون", nat: "إنجليزي", club: "أياكس الهولندي", pos: "لاعب وسط قائد ومحفز", feat: "القائد السابق لليفربول الذي رفع لقب البريميرليج والأبطال بالركض والقتالية العالية." },
+            { name: "رحيم ستيرلينغ", nat: "إنجليزي", club: "أرسنال الإنجليزي", pos: "جناح سريع مراوغ بالعمق", feat: "يمتاز بالتمركز الذكي داخل الصندوق والتسجيل بقمصان السيتي وتشيلسي وأرسنال." },
+            { name: "ماركوس راشفورد", nat: "إنجليزي", club: "مانشستر يونايتد", pos: "جناح أيسر سريع الصواريخ", feat: "صاحب الإنطلاقات السريعة والتسديدات القوية واحتفالية الإشارة للرأس الذكية للوعي." },
+            { name: "جادون سانشو", nat: "إنجليزي", club: "تشيلسي الإنجليزي", pos: "جناح مهارى بمساحات ضيقة", feat: "تألق بالدوري الألماني ويمتاز بالمراوغة الفردية السلسة وصناعة اللعب المتقن." },
+            { name: "ليروي ساني", nat: "ألماني", club: "بايرن ميونخ", pos: "جناح سريع صاروخي", feat: "يمتاز بالسرعة الخارقة على الأطراف والتسديدات المقوسة القوية بالقدم اليسرى." },
+            { name: "جمال موسيالا", nat: "ألماني", club: "بايرن ميونخ", pos: "ساحر المراوغة المتعرجة (بامبي)", feat: "يمتاز بالمرور بين المدافعين كأنه يرقص بالكرة ويسجل أهدافاً حاسمة بالدوري واليورو." },
+            { name: "فلوريان فيرتز", nat: "ألماني", club: "بايرس ليفركوزن", pos: "صانع ألعاب عبقري تاريخي", feat: "قاد ليفركوزن لدوري اللاهزيمة التاريخي بفضل أهدافه وتمريراته الحاسمة الفاخرة." },
+            { name: "كاى هافيرتز", nat: "ألماني", club: "أرسنال الإنجليزي", pos: "مهاجم وهمي / لاعب وسط ذكي", feat: "سجل هدف حسم نهائي دوري أبطال أوروبا 2021 لتشيلسي ويتألق بقيادة هجوم أرسنال." },
+            { name: "إلكاي غوندوغان", nat: "ألماني", club: "مانشستر سيتي", pos: "لاعب وسط حاسم المواعيد", feat: "قائد السيتي بالثلاثية وصاحب الأهداف التتويجية بالدقائق الأخيرة بالبريميرليج." },
+            { name: "توماس مولر", nat: "ألماني", club: "بايرن ميونخ", pos: "مستكشف المساحات (صاحب التميمة)", feat: "اللاعب الأذكى في التحرك بدون كرة وصاحب الأسيستات التاريخية بمونديال ألمانيا والبايرن." },
+            { name: "سيرج غنابري", nat: "ألماني", club: "بايرن ميونخ", pos: "جناح هداف (صاحب احتفالية الطبخ)", feat: "اشتهر بتسجيل الأهداف الغزيرة بأوروبا خصوصاً بلندن واحتفاليته الشهيرة بتحريك الإناء." },
+            { name: "جوشوا كيميتش", nat: "ألماني", club: "بايرن ميونخ", pos: "جوكر ارتكاز / ظهير أيمن", feat: "يمتاز بالعقلية القيادية القوية والتمريرات الطويلة الحريرية الحاسمة بالعمق." },
+            { name: "ليون غوريتسكا", nat: "ألماني", club: "بايرن ميونخ", pos: "لاعب وسط بدني مدمر", feat: "يمتاز بالقوة البدنية الهائلة والالتحامات القوية والتسديد من مسافات بعيدة مرعبة." },
+            { name: "رافائيل لياو", nat: "برتغالي", club: "ميلان الإيطالي", pos: "جناح سريع مراوغ (صاحب الابتسامة)", feat: "يمتاز بانطلاقة لا توقف على الجهة اليسرى ومراوغة الخصوم وهو يبتسم ببراعة." },
+            { name: "برونو غيماريش", nat: "برازيلي", club: "نيوكاسل يونايتد", pos: "لاعب وسط مقاتل وباني لعب", feat: "محرك نيوكاسل الأساسي ويمتاز بالصلابة البدنية والقدرة على افتكاك وصناعة الكرة." },
+            { name: "لوكاس باكيتا", nat: "برازيلي", club: "وست هام يونايتد", pos: "صانع ألعاب مهارى راقص", feat: "يمتاز بالتمريرات الاستعراضية الذكية والرقصات البرازيلية الشهيرة بعد الأهداف الفاخرة." },
+            { name: "جابرييل خيسوس", nat: "برازيلي", club: "أرسنال الإنجليزي", pos: "مهاجم متحرك مهارى", feat: "يمتاز بالضغط العالي والمراوغة داخل الصندوق وساهم بألقاب السيتي سابقاً وأرسنال." },
+            { name: "جابرييل مارتينيلي", nat: "برازيلي", club: "أرسنال الإنجليزي", pos: "جناح أيسر صاروخ سريع", feat: "يمتاز بالركض المباشر نحو المرمى والسرعة الكبيرة في الهجمات المرتدة السريعة." },
+            { name: "إيدير ميليتاو", nat: "برازيلي", club: "ريال مدريد الإسباني", pos: "قلب دفاع سريع قوي", feat: "مدافع الريال المتوج بدوري الأبطال ويمتاز بالسرعة والتدخلات الهوائية الحاسمة." },
+            { name: "ماركينيوس", nat: "برازيلي", club: "باريس سان جيرمان", pos: "قلب دفاع قائد صلب", feat: "قائد النادي الباريسي ويمتاز بقطع الكرات بالعمق والتسجيل بالرأس بالبطولات الأوروبية." },
+            { name: "تياغو سيلفا", nat: "برازيلي", club: "فلومينينسي", pos: "المدافع الوحش المخضرم (الوحش)", feat: "قاد دفاع ميلان وباريس وتشيلسي للألقاب ويعتبر من أذكى المدافعين بالتاريخ التكتيكي." },
+            { name: "دوشان فلاهوفيتش", nat: "صربي", club: "يوفنتوس الإيطالي", pos: "مهاجم قناص يساري", feat: "هداف البيانكونيري يوفنتوس القوي ويمتاز بالقوة بالصندوق والركلات الحرة المباشرة الدقيقة." },
+            { name: "فيديريكو فالفيردي", nat: "أوروغوياني", club: "ريال مدريد (الصقر الطائر)", pos: "لاعب وسط سريع قاصف للشباك", feat: "صاحب الركض اللانهائي والتسديدات الصاروخية التي هزت شباك كبار قارة أوروبا." },
+            { name: "داروين نونيز", nat: "أوروغوياني", club: "ليفربول الإنجليزي", pos: "مهاجم مشاغب سريع جداً", feat: "يمتاز بالسرعة الكبيرة وخلق الفرص المزعجة للمدافعين وأهدافه الجنونية غير المتوقعة." },
+            { name: "رونالد أراوخو", nat: "أوروغوياني", club: "برشلونة الإسباني", pos: "صخرة الدفاع الصلبة جداً", feat: "مدافع برشلونة القوي جداً بالالتحامات الجسدية والمتخصص في إيقاف الأجنحة السريعة." },
+            { name: "لويس دياز", nat: "كولومبي", club: "ليفربول الإنجليزي", pos: "جناح أيسر مراوغ لا يتوقف", feat: "يمتاز بالمراوغة على الخط والاختراق بمهارة عالية وهز شباك البريميرليج ببراعة." },
+            { name: "خاميس رودريغيز", nat: "كولومبي", club: "رايو فايكانو", pos: "صانع ألعاب هداف تاريخي", feat: "هداف كأس العالم 2014 وصاحب أجمل هدف طائر ونجم ريال مدريد والبايرن السابق." },
+            { name: "سون هيونغ مين", nat: "كوري جنوبي", club: "توتنهام هوتسبير", pos: "جناح هداف سريع (ملك آسيا)", feat: "هداف البريميرليج وصاحب هدف جائزة بوشكاش التاريخي بعد مراوغة فريق كامل بمفردة." },
+            { name: "كيم مين جاي", nat: "كوري جنوبي", club: "بايرن ميونخ", pos: "صخرة الدفاع الآسيوية (الوحش)", feat: "قاد نابولي للقب الدوري الإيطالي التاريخي بصلابته البدنية وانتقل لعملاق بافاريا بايرن." },
+            { name: "ألكسندر إيساك", nat: "سويدي", club: "نيوكاسل يونايتد", pos: "مهاجم مهارى طويل سريع", feat: "يمتاز بالطول والمراوغة بمرونة عالية كأنه جناح والإنهاء الهادئ بالدوري الإنجليزي." },
+            { name: "فيكتور جيوكيريس", nat: "سويدي", club: "سبورتينغ لشبونة", pos: "ماكينة الأهداف المرعبة بالبرتغال", feat: "صاحب احتفالية قناع الأيدي الشهيرة والمرعبة لجميع حراس ودفاعات قارة أوروبا." },
+            { name: "دافيد ألابا", nat: "نمساوي", club: "ريال مدريد الإسباني", pos: "مدافع جوكر أنيق", feat: "حصد السداسية مع البايرن وحقق الأبطال مع الريال وصاحب لقطة رفع الكرسي الشهيرة." },
+            { name: "كريستيان إريكسن", nat: "دنماركي", club: "مانشستر يونايتد", pos: "صانع ألعاب تمريرات هندسية", feat: "صاحب العودة الإعجازية للملاعب بعد أزمة قلبية باليورو ويمتاز بصناعة اللعب المتقن والذكي." },
+            { name: "راسموس هويلوند", nat: "دنماركي", club: "مانشستر يونايتد", pos: "مهاجم صريح واعد وقوي", feat: "الدبابة الدنماركية الشابة هداف اليونايتد صاحب الإنطلاقات البدنية الشرسة بالعمق." },
+            { name: "فيكتور أوسيمين", nat: "نيجيري", club: "غلطة سراي التركي", pos: "مهاجم قناص طائر (صاحب القناع)", feat: "قاد نابولي للقب الدوري التاريخي بهدم الشباك برأسه وقناعه الأسود الشهير والمميز." },
+            { name: "أديمولا لوكمان", nat: "نيجيري", club: "أتالانتا الإيطالي", pos: "جناح هداف حاسم (هاتريك الأبطال)", feat: "سجل هاتريك تاريخي إعجازي في نهائي الدوري الأوروبي ليكسر سلسلة لاهزيمة ليفركوزن." },
+            { name: "أليكس ريميرو", nat: "إسباني", club: "ريال سوسيداد", pos: "حارس مرمى", feat: "من أفضل حراس الدوري الإسباني في الحفاظ على نظافة الشباك والتصدي للكرات البعيدة." },
+            { name: "مارتن زوبيميندي", nat: "إسباني", club: "ريال سوسيداد", pos: "لاعب ارتكاز عبقري هادئ", feat: "بديل رودري بنهائي يورو 2024 وقدم شوطاً إعجازياً قاد به لاروخا للذهب الأوروبي." },
+            { name: "ميكيل أويارزابال", nat: "إسباني", club: "ريال سوسيداد", pos: "مهاجم / جناح حاسم الذهبي", feat: "صاحب هدف التتويج القاتل التاريخي لإسبانيا بنهائي يورو 2024 ضد إنجلترا بالدقيقة الأخيرة." },
+            { name: "نيكو ويليامز", nat: "إسباني", club: "أتلتيك بيلباو", pos: "جناح نفاثة مهارى مرعب", feat: "أبهر العالم بيورو 2024 بسرعاته ومراوغاته الثنائية الخارقة وصاحب هدف نهائي اليورو." },
+            { name: "أليكس غريمالدو", nat: "إسباني", club: "باير ليفيركوزن", pos: "ظهير أيسر هداف حواسم", feat: "صاحب ركلات حرة خارقة وسجل وصنع أهدافاً غزيرة بموسم اللاهزيمة التاريخي بألمانيا." },
+            { name: "جيريمي فريمبونغ", nat: "هولندي", club: "باير ليفيركوزن", pos: "ظهير / جناح قطار نفاثة", feat: "أسرع لاعبي ألمانيا ويمتاز بالقدرة الهجومية الكاسحة بمخططات المدرب تشابي ألونسو." },
+            { name: "غرانيت تشاكا", nat: "سويسري", club: "باير ليفيركوزن", pos: "قائد ارتكاز مدفعجي", feat: "قائد وسط ليفركوزن وأرسنال السابق ويمتاز بشخصيته القوية وتسديداته الصاروخية اليسارية." },
+            { name: "باتريك شيك", nat: "تشيكي", club: "باير ليفيركوزن", pos: "مهاجم هداف الأهداف القاتلة", feat: "صاحب هدف نصف الملعب الخرافي باليورو ومتخصص أهداف الدقائق الـ +90 القاتلة بليفركوزن." },
+            { name: "سيرهو غيراسي", nat: "غيني", club: "بوروسيا دورتموند", pos: "قناص الأهداف الغزيرة", feat: "نافس هالاند وكين بمعدلات التسجيل المرعبة بالبوندسليغا بإنهاءات مثالية بالصندوق." },
+            { name: "نيكو شلوتربيك", nat: "ألماني", club: "بوروسيا دورتموند", pos: "قلب دفاع قوي باليسرى", feat: "قاد دورتموند لنهائي أبطال أوروبا 2024 بقطع كرات بطولي وبناء هجمات دقيق." },
+            { name: "ماتس هوميلز", nat: "ألماني", club: "روما الإيطالي", pos: "مدافع خبرة (مبتكر الكاشفة الخارجية)", feat: "بطل العالم 2014 ويمتاز بتمريراته بوجه القدم الخارجي وأدائه الدفاعي الأنيق الخالد." },
+            { name: "ألكسندر بالوفليك", nat: "ألماني", club: "بايرن ميونخ", pos: "موهبة ارتكاز صاعدة", feat: "حجز مكانه أساسياً بوسط البايرن بفضل هدوئه الكبير وتمريراته الدقيقة كبار النجوم." },
+            { name: "بريل إمبولو", nat: "سويسري", club: "موناكو الفرنسي", pos: "مهاجم بدني كاسحة", feat: "يمتاز بالقوة البدنية المرعبة بالالتحامات وسرعته الكبيرة في اختراق الخطوط الخلفية." },
+            { name: "دونيل مالين", nat: "هولندي", club: "بوروسيا دورتموند", pos: "جناح / مهاجم سريع مخترق", feat: "يمتاز بإنطلاقاته القوية على الأطراف والإنهاء القوي بالشباك بالدوري الألماني وأوروبا." },
+            { name: "كريم أديمي", nat: "ألماني", club: "بوروسيا دورتموند", pos: "جناح خارق السرعة (الصاروخ)", feat: "من أسرع لاعبي العالم وتجاوز دفاعات كبار أندية أوروبا لسرعته الإعجازية المستحيلة." },
+            { name: "يان سومر", nat: "سويسري", club: "إنتر ميلان الإيطالي", pos: "حارس مرمى ردود فعل مستحيلة", feat: "المتخصص الأول بصد ركلات جزاء كبار نجوم أوروبا وبطل الدوري الإيطالي مع الإنتر بجدارة." },
+            { name: "بنجامين بافارد", nat: "فرنسي", club: "إنتر ميلان الإيطالي", pos: "مدافع / ظهير (صاحب صاروخ 2018)", feat: "صاحب أفضل هدف بمونديال روسيا بتسديدة على الطاير طائرة التفت بشباك الأرجنتين." },
+            { name: "دنزيل دومفريس", nat: "هولندي", club: "إنتر ميلان الإيطالي", pos: "ظهير أيمن بدني هجومي كاسح", feat: "يمتاز بالقوة الجسمانية الرهيبة والارتقاء الهوائي بالصندوق لتسجيل وصناعة الأهداف ل هولندا والإنتر." }
         ];
 
-        // ميكانيزم ملء بقية الـ 200 لاعب حقيقيين مئة بالمئة تلقائياً
-        for (let i = 1; i <= 165; i++) {
-            let base = extraNames[i % extraNames.length];
-            masterPlayersList.push({
-                name: `${base.n} (${String.fromCharCode(65 + (i%26))})`,
-                nat: base.nat,
-                club: base.c,
-                pos: base.p,
-                feat: base.f,
-                img: "https://a.espncdn.com/i/headshots/soccer/players/full/231747.png"
-            });
+        // حلقة تكرار ذكية ومستقلة لدمج المجموعتين والوصول لـ 200 لاعب حقيقي مستقل تماماً بدون أي تكرار أو كلمات "نسخة"
+        let currentLen = masterPlayersList.length;
+        let fillerNeeded = 200 - currentLen;
+        
+        for (let i = 0; i < fillerNeeded; i++) {
+            if (fillerData[i]) {
+                masterPlayersList.push({
+                    name: fillerData[i].name,
+                    nat: fillerData[i].nat,
+                    club: fillerData[i].club,
+                    pos: fillerData[i].pos,
+                    feat: fillerData[i].feat,
+                    img: "https://a.espncdn.com/i/headshots/soccer/players/full/231747.png" // صورة افتراضية موحدة وجميلة للجميع
+                });
+            }
         }
 
-        let p1Name = "";
-        let p2Name = "";
+        let p1Name = "يوسف";
+        let p2Name = "ياسين";
         let activeSlideIndex = 1;
         let selectedPlayerCard1 = null;
         let selectedPlayerCard2 = null;
         let singleActiveCard = null;
 
-        // دالة تفعيل الأطوار من القائمة الرئيسية
+        let globalScore = 0;       
+        let singleSessionScore = 0; 
+        let hasSkippedThisRound = false; 
+
+        window.onload = function() {
+            if (localStorage.getItem('guess_game_global_score')) {
+                globalScore = parseInt(localStorage.getItem('guess_game_global_score'));
+            }
+            updateScoreUI();
+        };
+
+        function updateScoreUI() {
+            document.getElementById('global-score-value').innerText = globalScore;
+            document.getElementById('single-session-score').innerText = singleSessionScore;
+        }
+
         function activateGameMode(mode) {
             document.getElementById('main-menu-screen').classList.add('hidden-mode');
             
             if (mode === 'single') {
                 document.getElementById('single-player-container').classList.remove('hidden-mode');
+                hasSkippedThisRound = false; 
                 generateRandomSingleCard();
             } else if (mode === 'multi') {
                 document.getElementById('multi-player-container').classList.remove('hidden-mode');
@@ -710,14 +944,13 @@
             }
         }
 
-        // العودة إلى القائمة الرئيسية الموحدة
         function exitToMainMenu() {
             document.getElementById('single-player-container').classList.add('hidden-mode');
             document.getElementById('multi-player-container').classList.add('hidden-mode');
             document.getElementById('main-menu-screen').classList.remove('hidden-mode');
+            updateScoreUI();
         }
 
-        // --- لوجيك الطور الفردي (لاعب 1) ---
         function generateRandomSingleCard() {
             let rand = masterPlayersList[Math.floor(Math.random() * masterPlayersList.length)];
             singleActiveCard = rand;
@@ -728,6 +961,17 @@
             document.getElementById('p-pos-0').innerText = rand.pos;
             document.getElementById('p-feat-0').innerText = rand.feat;
 
+            document.getElementById('next-card-btn-single').style.display = "none";
+            document.getElementById('search-box-single').disabled = false;
+            document.getElementById('search-box-single').value = "";
+
+            const shuffleBtn = document.getElementById('shuffle-card-btn-single');
+            if (hasSkippedThisRound) {
+                shuffleBtn.style.display = "none"; 
+            } else {
+                shuffleBtn.style.display = "block";
+            }
+
             const imgBox = document.getElementById('p-img-box-0');
             imgBox.innerHTML = "";
             if (rand.img) {
@@ -737,7 +981,14 @@
             }
         }
 
-        // --- لوجيك طور اللاعبين المعتمد (لاعبين) ---
+        function skipSingleCard() {
+            if (!hasSkippedThisRound) {
+                hasSkippedThisRound = true; 
+                generateRandomSingleCard(); 
+                alert("⚠️ استهلكت فرصة التخطي الوحيدة! الآن يجب عليك تخمين هذا اللاعب للفوز بالنقاط ولن تستطيع تخطيه.");
+            }
+        }
+
         function resetToFirstSlide() {
             document.getElementById(`slide-${activeSlideIndex}`).classList.remove('active');
             activeSlideIndex = 1;
@@ -797,10 +1048,20 @@
                 item.onclick = () => {
                     if (cardNumber === 0) {
                         if (player.name === singleActiveCard.name) {
-                            document.getElementById('p-name-0').innerText = `🎉 صح: ${singleActiveCard.name}`;
-                            alert("🏆 كفووو! إجابة صحيحة مئة بالمئة!");
+                            document.getElementById('p-name-0').innerText = `🎉 الإجابة صحيحة: ${singleActiveCard.name}`;
+                            
+                            globalScore += 10;
+                            singleSessionScore += 10;
+                            localStorage.setItem('guess_game_global_score', globalScore);
+                            updateScoreUI();
+
+                            alert("🏆 كفووو يا بطل! إجابة صحيحة (+10 نقاط محفوظة في رصيدك)!");
+                            
+                            document.getElementById('next-card-btn-single').style.display = "block";
+                            document.getElementById('shuffle-card-btn-single').style.display = "none";
+                            document.getElementById('search-box-single').disabled = true;
                         } else {
-                            alert("❌ خطأ! حاول التركيز في المواصفات مرة أخرى.");
+                            alert("❌ تخمين غير صحيح! ركز في التلميحات والمواصفات وحاول مرة أخرى.");
                         }
                         document.getElementById('search-box-single').value = "";
                     } else {
@@ -832,8 +1093,8 @@
         }
 
         function initGame() {
-            p1Name = document.getElementById('name-p1').value.trim() || "يوسف";
-            p2Name = document.getElementById('name-p2').value.trim() || "ياسين";
+            p1Name = document.getElementById('name-p1').value.trim() || "";
+            p2Name = document.getElementById('name-p2').value.trim() || "";
 
             let i1 = Math.floor(Math.random() * masterPlayersList.length);
             let i2 = Math.floor(Math.random() * masterPlayersList.length);
