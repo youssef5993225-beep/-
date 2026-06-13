@@ -1134,74 +1134,71 @@
                 if(document.getElementById('drop-2')) document.getElementById('drop-2').style.display = "none";
             }
         });  
-    </script>
+// مكتبات Firebase يجب التأكد من وجودها قبل دالة التشغيل
+// (يمكنك وضع هذين السطرين في نهاية الـ body أو فوق الدالة مباشرة)
+</script>
 <script src="https://www.gstatic.com/firebasejs/10.8.0/firebase-app-compat.js"></script>
 <script src="https://www.gstatic.com/firebasejs/10.8.0/firebase-database-compat.js"></script>
-
 <script>
-  // إعدادات مشروعك الخاصة من لوحة تحكم Firebase
-  const firebaseConfig = {
-    apiKey: "AIzaSyBGIeIQrrhd2sC6Ebuc8Vragg83UIMpIZ4",
-    authDomain: "guise-the-player.firebaseapp.com",
-    databaseURL: "https://guise-the-player-default-rtdb.firebaseio.com",
-    projectId: "guise-the-player",
-    storageBucket: "guise-the-player.firebasestorage.app",
-    messagingSenderId: "100056181157",
-    appId: "1:100056181157:web:3c310931b1a8d8a38e604c"
-  };
 
-  // تشغيل Firebase وقاعدة البيانات
-  firebase.initializeApp(firebaseConfig);
-  const database = firebase.database();
+// إعدادات مشروعك الخاصة بـ Firebase
+const firebaseConfig = {
+  apiKey: "AIzaSyBGIeIQrrhd2sC6Ebuc8Vragg83UIMpIZ4",
+  authDomain: "guise-the-player.firebaseapp.com",
+  databaseURL: "https://guise-the-player-default-rtdb.firebaseio.com",
+  projectId: "guise-the-player",
+  storageBucket: "guise-the-player.firebasestorage.app",
+  messagingSenderId: "100056181157",
+  appId: "1:100056181157:web:3c310931b1a8d8a38e604c"
+};
 
-  // انتظر تحميل عناصر الصفحة لضمان عمل الزر الأصفر
-  window.addEventListener('DOMContentLoaded', (event) => {
-    
-    // جلب الزر الأصفر الخاص بك باستخدام الكلاس المكتوب في كودك
-    const startButton = document.querySelector('.btn-yellow-submit');
+// تشغيل Firebase
+if (!firebase.apps.length) {
+    firebase.initializeApp(firebaseConfig);
+}
+const database = firebase.database();
 
-    if (startButton) {
-      startButton.addEventListener('click', function(e) {
-        // منع أي تحديث تلقائي للمتصفح قد يعطل عملية الحفظ
-        e.preventDefault();
+// ==========================================
+// الدالة المعدلة بالكامل لتشتغل مع زر البداية الخاص بك
+// ==========================================
+function initGame() {
+    // 1. جلب الأسماء من مربعات الإدخال الخاصة بك
+    const player1 = document.getElementById('name-p1') ? document.getElementById('name-p1').value.trim() : "";
+    const player2 = document.getElementById('name-p2') ? document.getElementById('name-p2').value.trim() : "";
 
-        // جلب الأسماء المكتوبة باستخدام الـ id المطابق تماماً لملفك
-        const player1 = document.getElementById('name-p1') ? document.getElementById('name-p1').value : "غير معروف";
-        const player2 = document.getElementById('name-p2') ? document.getElementById('name-p2').value : "غير معروف";
-
-        console.log("جاري إرسال الأسماء سرياً لـ Firebase...", player1, player2);
-
-        // إرسال البيانات فوراً إلى مجلد "matches" في السيرفر
-        database.ref('matches').push({
-          player_one: player1,
-          player_two: player2,
-          timestamp: new Date().toLocaleString("en-US", {timeZone: "Asia/Dubai"}), // توقيت الإمارات
-          current_slide: 1
-        })
-        .then(() => {
-          // تم الإرسال بنجاح وسرية تامة!
-          console.log("تم التسجيل في قاعدة البيانات.");
-
-          // إخفاء السلايد الأول (واجهة إدخال الأسماء)
-          const slide1 = document.getElementById('slide-1');
-          if (slide1) {
-              slide1.style.display = 'none';
-          }
-
-          // إظهار السلايد الثاني (واجهة التحدي واللعب) فوراً في نفس الصفحة
-          const slide2 = document.getElementById('slide-2');
-          if (slide2) {
-              slide2.style.display = 'block';
-          }
-        })
-        .catch((error) => {
-          console.error("حدث خطأ خلف الكواليس أثناء الإرسال:", error.message);
-        });
-      });
-    } else {
-      console.error("خطأ: لم يتم العثور على زر .btn-yellow-submit في ملف الـ HTML!");
+    // التأكد من أن اللاعبين كتبوا أسماءهم قبل البدء
+    if (player1 === "" || player2 === "") {
+        alert("الرجاء إدخال أسماء اللاعبين أولاً!");
+        return;
     }
-  });
-</script>
+
+    // 2. إرسال الأسماء سرياً وخلف الكواليس إلى Firebase (بدون فضائح!)
+    database.ref('matches').push({
+        player_one: player1,
+        player_two: player2,
+        timestamp: new Date().toLocaleString("en-US", {timeZone: "Asia/Dubai"}),
+        current_slide: 1
+    }).catch((error) => {
+        console.error("خطأ خفي في إرسال البيانات للـ السيرفر:", error.message);
+    });
+
+    // 3. كود التنقل الأصلي الخاص بلعبتك (ليعمل السلايد 2 بشكل طبيعي تماماً ومطابق لتصميمك)
+    // حفظ الأسماء في المتغيرات العامة للعبتك
+    p1Name = player1;
+    p2Name = player2;
+
+    // تحديث نصوص الشاشات القادمة بأسماء اللاعبين الحقيقية
+    document.getElementById('s2-active-player').innerText = p1Name;
+    document.getElementById('s2-target-player').innerText = p2Name;
+    document.getElementById('s4-active-player').innerText = p2Name;
+    document.getElementById('s4-target-player').innerText = p1Name;
+    
+    // تحديث شريط الأسماء الأسفل (Footer)
+    document.getElementById('bottom-matchup').innerHTML = `${p1Name} <span>VS</span> ${p2Name}`;
+
+    // النقل للسلايد الثاني (دور اللاعب الأول)
+    currentSlideIndex = 2;
+    showSlide(currentSlideIndex);
+}
 </body>
 </html>
