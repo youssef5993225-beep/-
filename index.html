@@ -1139,7 +1139,7 @@
 <script src="https://www.gstatic.com/firebasejs/10.8.0/firebase-database-compat.js"></script>
 
 <script>
-  // إعدادات مشروعك المربوط بـ Firebase
+  // إعدادات مشروعك الخاصة من لوحة تحكم Firebase
   const firebaseConfig = {
     apiKey: "AIzaSyBGIeIQrrhd2sC6Ebuc8Vragg83UIMpIZ4",
     authDomain: "guise-the-player.firebaseapp.com",
@@ -1150,41 +1150,56 @@
     appId: "1:100056181157:web:3c310931b1a8d8a38e604c"
   };
 
-  // تشغيل Firebase
+  // تشغيل Firebase وقاعدة البيانات
   firebase.initializeApp(firebaseConfig);
   const database = firebase.database();
 
+  // انتظر تحميل عناصر الصفحة لضمان عمل الزر الأصفر
   window.addEventListener('DOMContentLoaded', (event) => {
-    // جلب زر البدء الأصفر الخاص بك باستخدام الكلاس المكتوب في كودك
-    const startButton = document.querySelector('.btn-yellow-submit') || document.querySelector('button');
+    
+    // جلب الزر الأصفر الخاص بك باستخدام الكلاس المكتوب في كودك
+    const startButton = document.querySelector('.btn-yellow-submit');
 
     if (startButton) {
       startButton.addEventListener('click', function(e) {
-        // منع أي تحديث تلقائي للصفحة قد يعطل الإرسال
+        // منع أي تحديث تلقائي للمتصفح قد يعطل عملية الحفظ
         e.preventDefault();
 
-        // التعديل السحري: جلب الأسماء باستخدام الـ id الحقيقي الخاص بك في كودك!
+        // جلب الأسماء المكتوبة باستخدام الـ id المطابق تماماً لملفك
         const player1 = document.getElementById('name-p1') ? document.getElementById('name-p1').value : "غير معروف";
         const player2 = document.getElementById('name-p2') ? document.getElementById('name-p2').value : "غير معروف";
 
-        console.log("جاري الإرسال المباشر لـ:", player1, player2);
+        console.log("جاري إرسال الأسماء سرياً لـ Firebase...", player1, player2);
 
-        // دفع البيانات لـ Firebase
+        // إرسال البيانات فوراً إلى مجلد "matches" في السيرفر
         database.ref('matches').push({
           player_one: player1,
           player_two: player2,
-          timestamp: new Date().toLocaleString("en-US", {timeZone: "Asia/Dubai"}),
+          timestamp: new Date().toLocaleString("en-US", {timeZone: "Asia/Dubai"}), // توقيت الإمارات
           current_slide: 1
         })
         .then(() => {
-          alert("كفو! تم الربط وظهرت الأسماء في Firebase بنجاح! 🎉");
+          // تم الإرسال بنجاح وسرية تامة!
+          console.log("تم التسجيل في قاعدة البيانات.");
+
+          // إخفاء السلايد الأول (واجهة إدخال الأسماء)
+          const slide1 = document.getElementById('slide-1');
+          if (slide1) {
+              slide1.style.display = 'none';
+          }
+
+          // إظهار السلايد الثاني (واجهة التحدي واللعب) فوراً في نفس الصفحة
+          const slide2 = document.getElementById('slide-2');
+          if (slide2) {
+              slide2.style.display = 'block';
+          }
         })
         .catch((error) => {
-          alert("خطأ في الإرسال: " + error.message);
+          console.error("حدث خطأ خلف الكواليس أثناء الإرسال:", error.message);
         });
       });
     } else {
-      console.error("لم نجد زر .btn-yellow-submit في الصفحة!");
+      console.error("خطأ: لم يتم العثور على زر .btn-yellow-submit في ملف الـ HTML!");
     }
   });
 </script>
