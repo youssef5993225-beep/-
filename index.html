@@ -1135,11 +1135,11 @@
             }
         });  
     </script>
-<script type="module">
-  import { initializeApp } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-app.js";
-  import { getDatabase, ref, push, set } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-database.js";
+<script src="https://www.gstatic.com/firebasejs/10.8.0/firebase-app-compat.js"></script>
+<script src="https://www.gstatic.com/firebasejs/10.8.0/firebase-database-compat.js"></script>
 
-  // كود الإعدادات الخاص بك تم وضعه داخل الـ script بشكل صحيح
+<script>
+  // إعدادات مشروعك الخاصة المأخوذة من لقطات الشاشة بدقة
   const firebaseConfig = {
     apiKey: "AIzaSyBGIeIQrrhd2sC6Ebuc8Vragg83UIMpIZ4",
     authDomain: "guise-the-player.firebaseapp.com",
@@ -1150,30 +1150,46 @@
     appId: "1:100056181157:web:3c310931b1a8d8a38e604c"
   };
 
-  // تشغيل الـ Firebase وقاعدة البيانات
-  const app = initializeApp(firebaseConfig);
-  const database = getDatabase(app);
+  // تشغيل Firebase
+  firebase.initializeApp(firebaseConfig);
+  const database = firebase.database();
 
-  // دالة إرسال الأسماء عند الضغط على زر "ابدأ اللعبة الجولة"
-  document.querySelector('.btn-warning, button, #start-btn').addEventListener('click', function(e) {
-    // جلب ما يكتبه اللاعبون في الخانات
-    const player1 = document.getElementById('player1')?.value || "غير معروف";
-    const player2 = document.getElementById('player2')?.value || "غير معروف";
-
-    // إرسال البيانات فوراً إلى مجلد الـ matches في السيرفر
-    const matchesRef = ref(database, 'matches');
-    const newMatchRef = push(matchesRef);
+  // انتظر حتى يتم تحميل الصفحة بالكامل لمنع أي تعطل في الأزرار
+  window.addEventListener('DOMContentLoaded', (event) => {
     
-    set(newMatchRef, {
-      player_one: player1,
-      player_two: player2,
-      timestamp: new Date().toLocaleString("en-US", {timeZone: "Asia/Dubai"}),
-      current_slide: 1
-    }).then(() => {
-      console.log("تم إرسال الأسماء لـ Firebase!");
-    }).catch((error) => {
-      console.error("خطأ في الإرسال:", error);
-    });
+    // سنبحث عن الزر بأكثر من طريقة للتأكد من أن المتصفح سيجده ويشغله
+    const startButton = document.querySelector('.btn-warning') || document.querySelector('button') || document.getElementById('start-btn');
+
+    if (startButton) {
+      startButton.addEventListener('click', function(e) {
+        // منع الصفحة من إعادة التحميل (الـ Refresh) التلقائي عند الضغط
+        e.preventDefault();
+
+        // جلب الأسماء المكتوبة
+        const player1 = document.getElementById('player1') ? document.getElementById('player1').value : "غير معروف";
+        const player2 = document.getElementById('player2') ? document.getElementById('player2').value : "غير معروف";
+
+        console.log("جاري محاولة إرسال الأسماء...", player1, player2);
+
+        // إرسال البيانات مباشرة إلى Firebase
+        database.ref('matches').push({
+          player_one: player1,
+          player_two: player2,
+          timestamp: new Date().toLocaleString("en-US", {timeZone: "Asia/Dubai"}),
+          current_slide: 1
+        })
+        .then(() => {
+          alert("تم الربط بنجاح وظهرت الأسماء عند يوسف!");
+          // هنا يمكنك وضع السطر الذي ينقلك للصفحة التالية للعبة، مثل:
+          // window.location.href = "game.html";
+        })
+        .catch((error) => {
+          alert("حدث خطأ أثناء الإرسال: " + error.message);
+        });
+      });
+    } else {
+      console.error("لم يتم العثور على زر بدء اللعبة في صفحة الـ HTML! تأكد من وجود الزر.");
+    }
   });
 </script>
 </body>
