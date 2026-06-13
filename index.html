@@ -1133,14 +1133,48 @@
                 if(document.getElementById('drop-1')) document.getElementById('drop-1').style.display = "none";
                 if(document.getElementById('drop-2')) document.getElementById('drop-2').style.display = "none";
             }
-        });    const firebaseConfig = {
-     apiKey: "AIzaSyBGIeIQrrhd2sC6Ebuc8Vragg83UIMpIZ4",
-     authDomain: "guise-the-player.firebaseapp.com",
-     projectId: "guise-the-player",
-     storageBucket: "guise-the-player.firebasestorage.app",
-     messagingSenderId: "100056181157",
-     appId: "1:100056181157:web:3c310931b1a8d8a38e604c"
+        });  
     </script>
+<script type="module">
+  import { initializeApp } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-app.js";
+  import { getDatabase, ref, push, set } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-database.js";
 
+  // كود الإعدادات الخاص بك تم وضعه داخل الـ script بشكل صحيح
+  const firebaseConfig = {
+    apiKey: "AIzaSyBGIeIQrrhd2sC6Ebuc8Vragg83UIMpIZ4",
+    authDomain: "guise-the-player.firebaseapp.com",
+    databaseURL: "https://guise-the-player-default-rtdb.firebaseio.com",
+    projectId: "guise-the-player",
+    storageBucket: "guise-the-player.firebasestorage.app",
+    messagingSenderId: "100056181157",
+    appId: "1:100056181157:web:3c310931b1a8d8a38e604c"
+  };
+
+  // تشغيل الـ Firebase وقاعدة البيانات
+  const app = initializeApp(firebaseConfig);
+  const database = getDatabase(app);
+
+  // دالة إرسال الأسماء عند الضغط على زر "ابدأ اللعبة الجولة"
+  document.querySelector('.btn-warning, button, #start-btn').addEventListener('click', function(e) {
+    // جلب ما يكتبه اللاعبون في الخانات
+    const player1 = document.getElementById('player1')?.value || "غير معروف";
+    const player2 = document.getElementById('player2')?.value || "غير معروف";
+
+    // إرسال البيانات فوراً إلى مجلد الـ matches في السيرفر
+    const matchesRef = ref(database, 'matches');
+    const newMatchRef = push(matchesRef);
+    
+    set(newMatchRef, {
+      player_one: player1,
+      player_two: player2,
+      timestamp: new Date().toLocaleString("en-US", {timeZone: "Asia/Dubai"}),
+      current_slide: 1
+    }).then(() => {
+      console.log("تم إرسال الأسماء لـ Firebase!");
+    }).catch((error) => {
+      console.error("خطأ في الإرسال:", error);
+    });
+  });
+</script>
 </body>
 </html>
